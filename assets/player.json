@@ -1,0 +1,14 @@
+{
+    "name": "player",
+    "sprite": {
+        "sprite":  "character.png",
+        "h_tiles": 2,
+        "v_tiles": 2,
+        "index":   0,
+        "anchor":  [ 0.5, 0.5 ],
+        "blend":   "alpha"
+    },
+    "collision": {
+        "abox": [ -16, -16, 16, 16 ]
+    }
+}

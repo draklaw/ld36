@@ -55,6 +55,7 @@ void Game::initialize() {
 //	_splashState->setup(_mainState.get(), "titlescreen.png", 3);
 
 	_mainState->initialize();
+	_mainState->startGame();
 
 //	AssetSP music = _loader->loadAsset<MusicLoader>("shapeout.ogg");
 //	_loader->waitAll();

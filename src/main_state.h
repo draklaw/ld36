@@ -29,6 +29,7 @@
 #include <lair/utils/game_state.h>
 #include <lair/utils/interp_loop.h>
 #include <lair/utils/input.h>
+#include <lair/utils/tile_map.h>
 
 #include <lair/render_gl2/orthographic_camera.h>
 #include <lair/render_gl2/render_pass.h>
@@ -37,6 +38,8 @@
 #include <lair/ec/entity_manager.h>
 #include <lair/ec/sprite_component.h>
 #include <lair/ec/bitmap_text_component.h>
+#include <lair/ec/tile_layer_component.h>
+#include <lair/ec/collision_component.h>
 
 
 using namespace lair;
@@ -59,8 +62,18 @@ public:
 	Game* game();
 
 	void startGame();
+	void stopGame();
+
 	void updateTick();
 	void updateFrame();
+
+	// Game functions
+
+	bool isSolid(TileMap::TileIndex tile) const;
+	Vector2i cellCoord(const Vector2& pos, float height) const;
+	void computeCollisions();
+
+	// Stuff
 
 	void resizeEvent();
 
@@ -80,6 +93,8 @@ protected:
 	SpriteRenderer             _spriteRenderer;
 	SpriteComponentManager     _sprites;
 	BitmapTextComponentManager _texts;
+	TileLayerComponentManager  _tileLayers;
+	CollisionComponentManager  _collisions;
 //	AnimationComponentManager  _anims;
 	InputManager               _inputs;
 
@@ -96,7 +111,23 @@ protected:
 
 	Input* _quitInput;
 	Input* _restartInput;
+	Input* _upInput;
+	Input* _leftInput;
+	Input* _downInput;
+	Input* _rightInput;
 	Input* _skipInput;
+
+	// Models
+	EntityRef _models;
+	EntityRef _playerModel;
+
+	// Game entities
+	EntityRef _world;
+	EntityRef _baseLayer;
+	EntityRef _player;
+
+	// Game params
+	float _playerSpeed;
 };
 
 
