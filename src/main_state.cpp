@@ -116,7 +116,7 @@ void MainState::initialize() {
 	_leftInput    = _inputs.addInput("left");
 	_downInput    = _inputs.addInput("down");
 	_rightInput   = _inputs.addInput("right");
-	_useInput    = _inputs.addInput("skip");
+	_useInput     = _inputs.addInput("skip");
 
 	_inputs.mapScanCode(_quitInput,    SDL_SCANCODE_ESCAPE);
 	_inputs.mapScanCode(_restartInput, SDL_SCANCODE_F5);
@@ -140,10 +140,17 @@ void MainState::initialize() {
 	_models = _entities.createEntity(_entities.root(), "models");
 	_models.setEnabled(false);
 
+	loader()->load<BitmapFontLoader>("droid_sans_24.json");
+
 	loader()->load<TileMapLoader>("map_test.json");
+
+	loader()->load<ImageLoader>("dialog_box.png");
 
 	_playerModel = loadEntity("player.json", _models);
 	_collisions.get(_playerModel)->setHitMask(HIT_PLAYER_FLAG);
+
+	_itemModel = loadEntity("item.json", _models);
+	_collisions.get(_itemModel)->setHitMask(HIT_PLAYER_FLAG | HIT_TRIGGER_FLAG | HIT_USE_FLAG);
 
 	loader()->waitAll();
 
@@ -208,11 +215,32 @@ void MainState::startGame() {
 	baseLayer->setTileMap(_tileMap);
 	_baseLayer.place(Vector3(0, 0, 0));
 
+	// TODO: load level (should place _player)
+
 	_player = _entities.cloneEntity(_playerModel, _world);
 	_player.place(Vector3(70, 70, .1));
 
-	createTrigger(_world, "test_trigger", Box2(Vector2(1 * TILE_SIZE, 1 * TILE_SIZE),
-	                                           Vector2(5 * TILE_SIZE, 3 * TILE_SIZE)));
+	createTrigger(_world, "test_trigger", Box2(Vector2(1*TILE_SIZE, 1*TILE_SIZE),
+	                                           Vector2(5*TILE_SIZE, 3*TILE_SIZE)));
+
+	_hud = _entities.createEntity(_entities.root(), "hud");
+
+	_dialogBox = _entities.createEntity(_hud, "dialog_box");
+	_dialogBox.setEnabled(false);
+	SpriteComponent* dialogSprite = _sprites.addComponent(_dialogBox);
+	dialogSprite->setTexture("dialog_box.png");
+	dialogSprite->setAnchor(Vector2(.5, 0));
+	dialogSprite->setBlendingMode(BLEND_ALPHA);
+	dialogSprite->setTextureFlags(Texture::TRILINEAR | Texture::CLAMP);
+
+	int margin = 30;
+	_dialogText = _entities.createEntity(_dialogBox, "dialog_text");
+	_dialogText.place(Vector3(margin - 570, 300 - margin - 5, .1));
+	BitmapTextComponent* dialogText = _texts.addComponent(_dialogText);
+	dialogText->setFont("droid_sans_24.json");
+	dialogText->setAnchor(Vector2(0, 1));
+	dialogText->setColor(Vector4(.32, .295, .16, 1));
+	dialogText->setSize(Vector2i(1140 - 2 * margin, 300 - 2 * margin));
 }
 
 
@@ -238,58 +266,65 @@ void MainState::updateTick() {
 		startGame();
 	}
 
-	// Player movement
-	Vector2 offset(0, 0);
-	if(_upInput->isPressed())
-		offset(1) += 1;
-	if(_leftInput->isPressed())
-		offset(0) -= 1;
-	if(_downInput->isPressed())
-		offset(1) -= 1;
-	if(_rightInput->isPressed())
-		offset(0) += 1;
+	if(_messageQueue.empty()) {
+		// Player movement
+		Vector2 offset(0, 0);
+		if(_upInput->isPressed())
+			offset(1) += 1;
+		if(_leftInput->isPressed())
+			offset(0) -= 1;
+		if(_downInput->isPressed())
+			offset(1) -= 1;
+		if(_rightInput->isPressed())
+			offset(0) += 1;
 
-	float playerSpeed = _playerSpeed * float(TILE_SIZE) / float(TICKRATE);
-	if(!offset.isApprox(Vector2::Zero()))
-		_player.translation2() += offset.normalized() * playerSpeed;
+		float playerSpeed = _playerSpeed * float(TILE_SIZE) / float(TICKRATE);
+		if(!offset.isApprox(Vector2::Zero()))
+			_player.translation2() += offset.normalized() * playerSpeed;
 
-	computeCollisions();
+		computeCollisions();
 
-	CollisionComponent* pColl = _collisions.get(_player);
-	Vector2  bump(0, 0);
-	bump(0) += std::max(pColl->penetration(LEFT),  0.f);
-	bump(0) -= std::max(pColl->penetration(RIGHT), 0.f);
-	bump(1) += std::max(pColl->penetration(DOWN),  0.f);
-	bump(1) -= std::max(pColl->penetration(UP),    0.f);
-	_player.translate(bump);
+		CollisionComponent* pColl = _collisions.get(_player);
+		Vector2  bump(0, 0);
+		bump(0) += std::max(pColl->penetration(LEFT),  0.f);
+		bump(0) -= std::max(pColl->penetration(RIGHT), 0.f);
+		bump(1) += std::max(pColl->penetration(DOWN),  0.f);
+		bump(1) -= std::max(pColl->penetration(UP),    0.f);
+		_player.translate(bump);
 
+		// WARNING: returning early might skip updateWorldTransform.
+		// Update world transform before level logic so that collision match
+		_entities.updateWorldTransform();
 
-	// WARNING: returning early might skip updateWorldTransform.
-	// Update world transform before level logic so that collision match
-	_entities.updateWorldTransform();
+		// Level logic
+		HitEventQueue hitQueue;
+		_collisions.findCollisions(hitQueue);
+	//	for(const HitEvent& hit: hitQueue)
+	//		dbgLogger.debug("hit: ", hit.entities[0].name(), ", ", hit.entities[1].name());
 
-	// Level logic
-	HitEventQueue hitQueue;
-	_collisions.findCollisions(hitQueue);
-//	for(const HitEvent& hit: hitQueue)
-//		dbgLogger.debug("hit: ", hit.entities[0].name(), ", ", hit.entities[1].name());
+		EntityRef useEntity;
+		if(_useInput->justPressed()) {
+			std::deque<EntityRef> useQueue;
+			_collisions.hitTest(useQueue, _player.worldTransform().translation().head<2>(), HIT_USE_FLAG);
 
-	EntityRef useEntity;
-	if(_useInput->justPressed()) {
-		std::deque<EntityRef> useQueue;
-		_collisions.hitTest(useQueue, _player.worldTransform().translation().head<2>(), HIT_USE_FLAG);
-
-		if(!useQueue.empty()) {
-			useEntity = useQueue.front();
-			dbgLogger.debug("use: ", useEntity.name());
+			if(!useQueue.empty()) {
+				useEntity = useQueue.front();
+				dbgLogger.debug("use: ", useEntity.name());
+			}
 		}
-	}
 
-	std::string levelName = _tileMap->properties().get("name", "__noname__").asString();
-	if(_levelLogicMap.count(levelName))
-		_levelLogicMap[levelName](hitQueue, useEntity);
-	else
-		dbgLogger.warning("Level \"", levelName, "\" unknown.");
+		std::string levelName = _tileMap->properties().get("name", "__noname__").asString();
+		if(_levelLogicMap.count(levelName))
+			_levelLogicMap[levelName](*this, hitQueue, useEntity);
+		else
+			dbgLogger.warning("Level \"", levelName, "\" unknown.");
+	}
+	else {
+		if(_useInput->justPressed())
+			nextMessage();
+
+		_entities.updateWorldTransform();
+	}
 }
 
 
@@ -298,11 +333,33 @@ void MainState::updateFrame() {
 	double etime = double(_loop.frameTime() - _prevFrameTime) / double(ONE_SEC);
 
 	Vector2 playerPos = _player.interpTransform(_loop.frameInterp()).translation().head<2>();
-	Vector3 center;
-	center << playerPos, 0;
-	Vector3 viewSize(window()->width(), window()->height(), 1);
-	Box3 viewBox(center - viewSize / 2, center + viewSize / 2);
+	Vector2 viewSize(window()->width(), window()->height());
+	Box3 viewBox((Vector3() << playerPos - viewSize / 2, 0).finished(),
+	             (Vector3() << playerPos + viewSize / 2, 1).finished());
 	_camera.setViewBox(viewBox);
+
+	float hudHeight = SCREEN_HEIGHT;
+	float hudScale = float(window()->height()) / hudHeight;
+	float hudWidth = float(window()->width()) / hudScale;
+
+	Transform hudTrans = Transform::Identity();
+	hudTrans.translate(Vector3(viewBox.min()));
+	hudTrans.scale(hudScale);
+	_hud.place(hudTrans);
+	_hud.resetPrevWorldTransform();
+
+	_dialogBox.place(Vector3(hudWidth / 2, 40, .8));
+	_dialogBox.resetPrevWorldTransform();
+
+	_dialogText.updateWorldTransform();
+	_dialogText.resetPrevWorldTransform();
+
+	for(int i=0; i < _inventorySlots.size(); ++i) {
+		EntityRef item = _inventorySlots[i];
+		item.place(Vector3(48 + 80 * i, hudHeight - 48, 0.8));
+		item.updateWorldTransform();
+		item.resetPrevWorldTransform();
+	}
 
 	renderer()->uploadPendingTextures();
 
@@ -327,12 +384,63 @@ void MainState::updateFrame() {
 	uint64 now = sys()->getTimeNs();
 	++_fpsCount;
 	if(_fpsCount == FRAMERATE) {
-		log().info("Fps: ", _fpsCount * float(ONE_SEC) / (now - _fpsTime));
+		log().info("FPS: ", _fpsCount * float(ONE_SEC) / (now - _fpsTime));
 		_fpsTime  = now;
 		_fpsCount = 0;
 	}
 
 	_prevFrameTime = _loop.frameTime();
+}
+
+
+void MainState::enqueueMessage(const std::string& message) {
+	_messageQueue.push_back(message);
+	if(_messageQueue.size() == 1) {
+		_dialogBox.setEnabled(true);
+		_texts.get(_dialogText)->setText(message);
+	}
+}
+
+
+void MainState::nextMessage() {
+	_messageQueue.pop_front();
+	bool show = _messageQueue.size();
+	_dialogBox.setEnabled(show);
+	if(show)
+		_texts.get(_dialogText)->setText(_messageQueue.front());
+}
+
+
+bool MainState::hasItem(Item item) {
+	for(auto it = _inventorySlots.begin(); it != _inventorySlots.end(); ++it) {
+		EntityRef entity = *it;
+		if(_sprites.get(entity)->tileIndex() == item) {
+			return true;
+		}
+	}
+	return false;
+}
+
+
+void MainState::addToInventory(Item item) {
+	dbgLogger.info("Add item ", item);
+	EntityRef entity = _entities.cloneEntity(_itemModel, _hud);
+	_sprites.get(entity)->setTileIndex(item);
+	_inventorySlots.push_back(entity);
+}
+
+
+void MainState::removeFromInventory(Item item) {
+	for(auto it = _inventorySlots.begin(); it != _inventorySlots.end(); ++it) {
+		EntityRef entity = *it;
+		if(_sprites.get(entity)->tileIndex() == item) {
+			dbgLogger.info("Remove item ", item);
+			entity.destroy();
+			_inventorySlots.erase(it);
+			return;
+		}
+	}
+	lairAssert(false);
 }
 
 

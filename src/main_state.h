@@ -46,10 +46,19 @@ using namespace lair;
 
 
 class Game;
+class MainState;
 
 
-typedef void (*LevelLogic)(HitEventQueue& hitQueue, EntityRef useEntity);
+typedef void (*LevelLogic)(MainState& state, HitEventQueue& hitQueue, EntityRef useEntity);
 typedef std::unordered_map<std::string, LevelLogic> LevelLogicMap;
+
+
+enum Item {
+	ITEM_0,
+	ITEM_1,
+	ITEM_2,
+	ITEM_BG,
+};
 
 
 class MainState : public GameState {
@@ -72,6 +81,13 @@ public:
 	void updateFrame();
 
 	// Game functions
+
+	void enqueueMessage(const std::string& message);
+	void nextMessage();
+
+	bool hasItem(Item item);
+	void addToInventory(Item item);
+	void removeFromInventory(Item item);
 
 	bool isSolid(TileMap::TileIndex tile) const;
 	Vector2i cellCoord(const Vector2& pos, float height) const;
@@ -107,6 +123,7 @@ protected:
 	SlotTracker _slotTracker;
 
 	LevelLogicMap _levelLogicMap;
+	std::deque<std::string> _messageQueue;
 
 	OrthographicCamera _camera;
 
@@ -130,11 +147,18 @@ protected:
 	// Models
 	EntityRef _models;
 	EntityRef _playerModel;
+	EntityRef _itemModel;
 
 	// Game entities
 	EntityRef _world;
 	EntityRef _baseLayer;
 	EntityRef _player;
+
+	// HUD entities
+	EntityRef _hud;
+	EntityRef _dialogBox;
+	EntityRef _dialogText;
+	std::vector<EntityRef> _inventorySlots;
 
 	// Game params
 	float _playerSpeed;

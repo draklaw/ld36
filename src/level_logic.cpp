@@ -29,5 +29,10 @@ void fillLevelLogicMap(LevelLogicMap& map) {
 }
 
 
-void test_logic(HitEventQueue& hitQueue, EntityRef useEnity) {
+void test_logic(MainState& state, HitEventQueue& hitQueue, EntityRef useEntity) {
+	if(useEntity.isValid() && std::strcmp(useEntity.name(), "test_trigger") == 0) {
+		state.enqueueMessage("Sit possimus sed dignissimos necessitatibus quia asperiores. Soluta rem ut quia quia autem sequi nemo eius. Doloribus et recusandae exercitationem at laboriosam qui. Facere sed quas et quasi. Voluptates qui est omnis. Sit ut perferendis consequatur est distinctio et.");
+		state.enqueueMessage("Incidunt mollitia eos molestias laudantium. Eos et ratione ullam commodi ratione ea. Inventore eius vel ut. Error hic minima laborum est numquam ut et. Quisquam deserunt repellendus et esse. Facilis iste animi explicabo.");
+		state.enqueueMessage("Enim vel et rerum aut vero accusamus. Nam beatae perferendis nemo deserunt modi. Consequatur aut quia provident aliquid unde velit. Eligendi illo nesciunt ut quia dolores. Vero eius fugiat repellat et quas non. Quo non reprehenderit fugit illo occaecati.");
+	}
 }

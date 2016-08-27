@@ -28,7 +28,7 @@
 
 void fillLevelLogicMap(LevelLogicMap& map);
 
-void test_logic(HitEventQueue& hitQueue, EntityRef useEnity);
+void test_logic(MainState& state, HitEventQueue& hitQueue, EntityRef useEnity);
 
 
 #endif
