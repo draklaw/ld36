@@ -27,6 +27,7 @@
 
 #include "game.h"
 #include "splash_state.h"
+#include "level_logic.h"
 
 #include "main_state.h"
 
@@ -43,6 +44,10 @@
 #define TILE_SIZE       48
 #define TILE_SET_WIDTH  2
 #define TILE_SET_HEIGHT 2
+
+#define HIT_PLAYER_FLAG  0x01
+#define HIT_TRIGGER_FLAG 0x02
+#define HIT_USE_FLAG     0x04
 
 
 MainState::MainState(Game* game)
@@ -75,7 +80,7 @@ MainState::MainState(Game* game)
       _leftInput    (nullptr),
       _downInput    (nullptr),
       _rightInput   (nullptr),
-      _skipInput    (nullptr),
+      _useInput     (nullptr),
 
       _playerSpeed(3)
 {
@@ -111,7 +116,7 @@ void MainState::initialize() {
 	_leftInput    = _inputs.addInput("left");
 	_downInput    = _inputs.addInput("down");
 	_rightInput   = _inputs.addInput("right");
-	_skipInput    = _inputs.addInput("skip");
+	_useInput    = _inputs.addInput("skip");
 
 	_inputs.mapScanCode(_quitInput,    SDL_SCANCODE_ESCAPE);
 	_inputs.mapScanCode(_restartInput, SDL_SCANCODE_F5);
@@ -123,7 +128,14 @@ void MainState::initialize() {
 	_inputs.mapScanCode(_leftInput,    SDL_SCANCODE_LEFT);
 	_inputs.mapScanCode(_downInput,    SDL_SCANCODE_DOWN);
 	_inputs.mapScanCode(_rightInput,   SDL_SCANCODE_RIGHT);
-	_inputs.mapScanCode(_skipInput,    SDL_SCANCODE_SPACE);
+	_inputs.mapScanCode(_useInput,     SDL_SCANCODE_SPACE);
+	_inputs.mapScanCode(_useInput,     SDL_SCANCODE_RETURN);
+	_inputs.mapScanCode(_useInput,     SDL_SCANCODE_RETURN2);
+	_inputs.mapScanCode(_useInput,     SDL_SCANCODE_E);
+	_inputs.mapScanCode(_useInput,     SDL_SCANCODE_LCTRL);
+	_inputs.mapScanCode(_useInput,     SDL_SCANCODE_RCTRL);
+
+	fillLevelLogicMap(_levelLogicMap);
 
 	_models = _entities.createEntity(_entities.root(), "models");
 	_models.setEnabled(false);
@@ -131,8 +143,10 @@ void MainState::initialize() {
 	loader()->load<TileMapLoader>("map_test.json");
 
 	_playerModel = loadEntity("player.json", _models);
+	_collisions.get(_playerModel)->setHitMask(HIT_PLAYER_FLAG);
 
 	loader()->waitAll();
+
 	renderer()->uploadPendingTextures();
 
 	Mix_Volume(-1, 64);
@@ -190,11 +204,15 @@ void MainState::startGame() {
 
 	_baseLayer = _entities.createEntity(_world, "base_layer");
 	TileLayerComponent* baseLayer = _tileLayers.addComponent(_baseLayer);
-	baseLayer->setTileMap(assets()->getAsset("map_test.json")->aspect<TileMapAspect>()->get());
+	_tileMap = assets()->getAsset("map_test.json")->aspect<TileMapAspect>()->get();
+	baseLayer->setTileMap(_tileMap);
 	_baseLayer.place(Vector3(0, 0, 0));
 
 	_player = _entities.cloneEntity(_playerModel, _world);
 	_player.place(Vector3(70, 70, .1));
+
+	createTrigger(_world, "test_trigger", Box2(Vector2(1 * TILE_SIZE, 1 * TILE_SIZE),
+	                                           Vector2(5 * TILE_SIZE, 3 * TILE_SIZE)));
 }
 
 
@@ -204,6 +222,8 @@ void MainState::stopGame() {
 	_world.release();
 	_baseLayer.release();
 	_player.release();
+
+	_tileMap.reset();
 }
 
 
@@ -219,15 +239,19 @@ void MainState::updateTick() {
 	}
 
 	// Player movement
-	float playerSpeed = _playerSpeed * float(TILE_SIZE) / float(TICKRATE);
+	Vector2 offset(0, 0);
 	if(_upInput->isPressed())
-		_player.translate(0, playerSpeed);
+		offset(1) += 1;
 	if(_leftInput->isPressed())
-		_player.translate(-_playerSpeed, 0);
+		offset(0) -= 1;
 	if(_downInput->isPressed())
-		_player.translate(0, -_playerSpeed);
+		offset(1) -= 1;
 	if(_rightInput->isPressed())
-		_player.translate(_playerSpeed, 0);
+		offset(0) += 1;
+
+	float playerSpeed = _playerSpeed * float(TILE_SIZE) / float(TICKRATE);
+	if(!offset.isApprox(Vector2::Zero()))
+		_player.translation2() += offset.normalized() * playerSpeed;
 
 	computeCollisions();
 
@@ -239,11 +263,33 @@ void MainState::updateTick() {
 	bump(1) -= std::max(pColl->penetration(UP),    0.f);
 	_player.translate(bump);
 
-//	SpriteComponent* pSprite = _sprites.get(_player);
-//	pSprite->setTileIndex(hit);
 
 	// WARNING: returning early might skip updateWorldTransform.
+	// Update world transform before level logic so that collision match
 	_entities.updateWorldTransform();
+
+	// Level logic
+	HitEventQueue hitQueue;
+	_collisions.findCollisions(hitQueue);
+//	for(const HitEvent& hit: hitQueue)
+//		dbgLogger.debug("hit: ", hit.entities[0].name(), ", ", hit.entities[1].name());
+
+	EntityRef useEntity;
+	if(_useInput->justPressed()) {
+		std::deque<EntityRef> useQueue;
+		_collisions.hitTest(useQueue, _player.worldTransform().translation().head<2>(), HIT_USE_FLAG);
+
+		if(!useQueue.empty()) {
+			useEntity = useQueue.front();
+			dbgLogger.debug("use: ", useEntity.name());
+		}
+	}
+
+	std::string levelName = _tileMap->properties().get("name", "__noname__").asString();
+	if(_levelLogicMap.count(levelName))
+		_levelLogicMap[levelName](hitQueue, useEntity);
+	else
+		dbgLogger.warning("Level \"", levelName, "\" unknown.");
 }
 
 
@@ -346,7 +392,6 @@ void MainState::computeCollisions() {
 
 	TileLayerComponent* tlc = _tileLayers.get(_baseLayer);
 	lairAssert(tlc && tlc->tileMap());
-	TileMapSP tileMap = tlc->tileMap();
 	unsigned layer = tlc->layerIndex();
 
 	for(int i = 0; i < N_DIRECTIONS; ++i)
@@ -355,24 +400,34 @@ void MainState::computeCollisions() {
 	Vector2 pos  = _player.transform().translation().head<2>();
 	Box2    realBox(pos + cc->shape()->point(0), pos + cc->shape()->point(1));
 	Vector2 size = realBox.sizes();
-	Box2i box(cellCoord(realBox.corner(Box2::TopLeft),     tileMap->height(layer)),
-	          cellCoord(realBox.corner(Box2::BottomRight), tileMap->height(layer)));
+	Box2i box(cellCoord(realBox.corner(Box2::TopLeft),     _tileMap->height(layer)),
+	          cellCoord(realBox.corner(Box2::BottomRight), _tileMap->height(layer)));
 
-	int width  = tileMap->width(layer);
-	int height = tileMap->height(layer);
+	int width  = _tileMap->width(layer);
+	int height = _tileMap->height(layer);
 	int beginX = std::max(box.min()(0) - 1, 0);
 	int endX   = std::min(box.max()(0) + 2, width);
 	int beginY = std::max(box.min()(1) - 1, 0);
 	int endY   = std::min(box.max()(1) + 2, height);
 	for(int y = beginY; y < endY; ++y) {
 		for(int x = beginX; x < endX; ++x) {
-			if(isSolid(tileMap->tile(x, y, layer))) {
+			if(isSolid(_tileMap->tile(x, y, layer))) {
 				Box2 tileBox(Vector2(x, height - y - 1) * TILE_SIZE,
 				             Vector2(x + 1, height - y) * TILE_SIZE);
 				updatePenetration(cc, realBox, tileBox);
 			}
 		}
 	}
+}
+
+
+EntityRef MainState::createTrigger(EntityRef parent, const char* name, const Box2& box) {
+	EntityRef entity = _entities.createEntity(parent, name);
+	CollisionComponent* cc = _collisions.addComponent(entity);
+	cc->setShape(Shape::newAlignedBox(box));
+	cc->setHitMask(HIT_PLAYER_FLAG | HIT_TRIGGER_FLAG | HIT_USE_FLAG);
+	cc->setIgnoreMask(HIT_TRIGGER_FLAG);
+	return entity;
 }
 
 

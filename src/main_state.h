@@ -48,6 +48,10 @@ using namespace lair;
 class Game;
 
 
+typedef void (*LevelLogic)(HitEventQueue& hitQueue, EntityRef useEntity);
+typedef std::unordered_map<std::string, LevelLogic> LevelLogicMap;
+
+
 class MainState : public GameState {
 public:
 	MainState(Game* game);
@@ -72,6 +76,8 @@ public:
 	bool isSolid(TileMap::TileIndex tile) const;
 	Vector2i cellCoord(const Vector2& pos, float height) const;
 	void computeCollisions();
+
+	EntityRef createTrigger(EntityRef parent, const char* name, const Box2& box);
 
 	// Stuff
 
@@ -100,6 +106,8 @@ protected:
 
 	SlotTracker _slotTracker;
 
+	LevelLogicMap _levelLogicMap;
+
 	OrthographicCamera _camera;
 
 	bool       _initialized;
@@ -115,7 +123,9 @@ protected:
 	Input* _leftInput;
 	Input* _downInput;
 	Input* _rightInput;
-	Input* _skipInput;
+	Input* _useInput;
+
+	TileMapSP _tileMap;
 
 	// Models
 	EntityRef _models;
