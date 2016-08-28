@@ -33,6 +33,8 @@ int echoCommand(MainState* state, EntityRef self, int argc, const char** argv) {
 	for(int i = 1; i < argc; ++i)
 		out << " " << argv[i];
 	dbgLogger.info(out.str());
+
+	return 0;
 }
 
 
@@ -65,4 +67,27 @@ int switchDoorCommand(MainState* state, EntityRef self, int argc, const char** a
 	for(EntityRef entity: targets) {
 		setDoorOpen(state, entity, !isDoorOpen(state, entity));
 	}
+
+	return 0;
+}
+
+
+int pickupItem(MainState* state, EntityRef self, int argc, const char** argv) {
+	if(!self.isValid()) {
+		dbgLogger.warning("pickupItem: self is not set.");
+		return -2;
+	}
+
+	SpriteComponent* sc = state->_sprites.get(self);
+	if(!sc) {
+		dbgLogger.warning("pickupItem: ", self.name(), " do not look like an item.");
+		return -2;
+	}
+
+	int item = sc->tileIndex();
+	state->addToInventory(Item(item));
+
+	self.setEnabled(false);
+
+	return 0;
 }

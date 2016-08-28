@@ -111,7 +111,7 @@ void Level::initialize() {
 	_entityMap.clear();
 	if(_levelRoot.isValid())
 		_levelRoot.destroy();
-	_levelRoot = _mainState->_entities.createEntity(_mainState->_entities.root());
+	_levelRoot = _mainState->_entities.createEntity(_mainState->_world, _path.native().c_str());
 	_levelRoot.setEnabled(false);
 
 	_baseLayer = createLayer(0, "layer_base");
@@ -125,14 +125,17 @@ void Level::initialize() {
 			if(type == "trigger") {
 				entity = createTrigger(obj, name);
 			}
-			if(type == "door") {
+			else if(type == "item") {
+				entity = createItem(obj, name);
+			}
+			else if(type == "door") {
 				entity = createDoor(obj, name);
 			}
 			else if(type == "spawn") {
 				_spawnPoint = objectBox(obj).center();
 			}
 
-			if(!entity.isValid())
+			if(!entity.isValid() && type != "spawn")
 				dbgLogger.warning(_path, ": Failed to load entity \"", name, "\" of type \"", type, "\"");
 			else
 				_entityMap.emplace(name, entity);
@@ -192,7 +195,7 @@ EntityRef Level::createTrigger(const Json::Value &obj, const std::string& name) 
 	Box2 hitBox(marginVec, box.sizes() - 2 * marginVec);
 
 	EntityRef entity = _mainState->createTrigger(_levelRoot, name.c_str(), hitBox);
-	entity.place((Vector3() << box.min(), 0.09).finished());
+	entity.place((Vector3() << box.min(), 0.08).finished());
 
 
 	TriggerComponent* tc = _mainState->_triggers.addComponent(entity);
@@ -209,6 +212,21 @@ EntityRef Level::createTrigger(const Json::Value &obj, const std::string& name) 
 		sc->setAnchor(Vector2(0, 0));
 		sc->setBlendingMode(BLEND_ALPHA);
 	}
+
+	return entity;
+}
+
+
+EntityRef Level::createItem(const Json::Value& obj, const std::string& name) {
+	Json::Value props = obj.get("properties", Json::Value());
+	Box2 box  = objectBox(obj);
+	int  item = props.get("item", 0).asInt();
+
+	EntityRef entity = _mainState->_entities.cloneEntity(_mainState->_itemModel, _levelRoot, name.c_str());
+	entity.place((Vector3() << box.center(), .09).finished());
+
+	SpriteComponent* sc = _mainState->_sprites.get(entity);
+	sc->setTileIndex(item);
 
 	return entity;
 }

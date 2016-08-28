@@ -36,18 +36,14 @@
 using namespace lair;
 
 
+class TriggerComponentManager;
+
 class TriggerComponent : public Component {
 public:
-	typedef DenseComponentManager<TriggerComponent> Manager;
+	typedef TriggerComponentManager Manager;
 
 public:
-	inline TriggerComponent(Manager* manager, _Entity* entity)
-		: Component(manager, entity)
-		, prevInside(false)
-		, inside(false)
-	{
-	}
-
+	TriggerComponent(Manager* manager, _Entity* entity);
 	TriggerComponent(const TriggerComponent&)  = delete;
 	TriggerComponent(      TriggerComponent&&) = default;
 	~TriggerComponent() = default;
@@ -63,7 +59,14 @@ public:
 	std::string onUse;
 };
 
-typedef TriggerComponent::Manager TriggerComponentManager;
+class TriggerComponentManager : public DenseComponentManager<TriggerComponent> {
+public:
+	TriggerComponentManager();
+
+	virtual TriggerComponent* addComponentFromJson(EntityRef entity, const Json::Value& json,
+	                                  const Path& cd=Path());
+	virtual TriggerComponent* cloneComponent(EntityRef base, EntityRef entity);
+};
 
 
 #endif

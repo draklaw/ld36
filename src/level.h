@@ -71,6 +71,7 @@ public:
 
 	EntityRef createLayer(unsigned index, const char* name);
 	EntityRef createTrigger(const Json::Value& obj, const std::string& name);
+	EntityRef createItem(const Json::Value& obj, const std::string& name);
 	EntityRef createDoor(const Json::Value& obj, const std::string& name);
 
 	const Path& path() { return _path; }

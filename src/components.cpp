@@ -24,3 +24,39 @@
 #include "components.h"
 
 
+TriggerComponent::TriggerComponent(Manager* manager, _Entity* entity)
+	: Component(manager, entity)
+	, prevInside(false)
+	, inside(false)
+{
+}
+
+
+TriggerComponentManager::TriggerComponentManager()
+	: DenseComponentManager<TriggerComponent>("trigger", 128)
+{
+}
+
+
+TriggerComponent* TriggerComponentManager::addComponentFromJson(
+        EntityRef entity, const Json::Value& json, const Path& cd) {
+	TriggerComponent* comp = addComponent(entity);
+
+	comp->onEnter = json.get("on_enter", "").asString();
+	comp->onExit  = json.get("on_exit",  "").asString();
+	comp->onUse   = json.get("on_use",   "").asString();
+
+	return comp;
+}
+
+
+TriggerComponent* TriggerComponentManager::cloneComponent(EntityRef base, EntityRef entity) {
+	TriggerComponent* baseComp = get(base);
+	TriggerComponent* comp = _addComponent(entity, baseComp);
+
+	comp->onEnter = baseComp->onEnter;
+	comp->onExit  = baseComp->onExit;
+	comp->onUse   = baseComp->onUse;
+
+	return comp;
+}

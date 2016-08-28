@@ -178,6 +178,7 @@ public:
 	EntityRef _models;
 	EntityRef _playerModel;
 	EntityRef _itemModel;
+	EntityRef _itemHudModel;
 	EntityRef _doorHModel;
 	EntityRef _doorVModel;
 

@@ -43,5 +43,7 @@ bool isDoorOpen(MainState* state, EntityRef door);
 void setDoorOpen(MainState* state, EntityRef door, bool open);
 int switchDoorCommand(MainState* state, EntityRef self, int argc, const char** argv);
 
+int pickupItem(MainState* state, EntityRef self, int argc, const char** argv);
+
 
 #endif

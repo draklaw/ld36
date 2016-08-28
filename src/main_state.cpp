@@ -33,6 +33,16 @@
 #include "main_state.h"
 
 
+void dumpEntities(EntityRef entity, int level) {
+	dbgLogger.log(std::string(2*level, ' '), entity.name(), ", ", entity.worldTransform()(2, 3));
+	EntityRef e = entity.firstChild();
+	while(e.isValid()) {
+		dumpEntities(e, level + 1);
+		e = e.nextSibling();
+	}
+}
+
+
 MainState::MainState(Game* game)
 	: GameState(game),
 
@@ -46,7 +56,7 @@ MainState::MainState(Game* game)
       _tileLayers(&_mainPass, &_spriteRenderer),
       _collisions(),
 
-      _triggers("trigger", 128),
+      _triggers(),
 
       _inputs(sys(), &log()),
 
@@ -77,7 +87,8 @@ MainState::MainState(Game* game)
 	_entities.registerComponentManager(&_texts);
 	_entities.registerComponentManager(&_tileLayers);
 
-	_commands["switch"] = switchDoorCommand;
+	_commands["switch"]      = switchDoorCommand;
+	_commands["pickup_item"] = pickupItem;
 }
 
 
@@ -138,7 +149,9 @@ void MainState::initialize() {
 	_collisions.get(_playerModel)->setHitMask(HIT_PLAYER_FLAG | HIT_SOLID_FLAG);
 
 	_itemModel = loadEntity("item.json", _models);
-	_collisions.get(_itemModel)->setHitMask(HIT_PLAYER_FLAG | HIT_TRIGGER_FLAG | HIT_USE_FLAG);
+	_collisions.get(_itemModel)->setHitMask(HIT_USE_FLAG);
+
+	_itemHudModel = loadEntity("item_hud.json", _models);
 
 	_doorHModel = loadEntity("door_h.json", _models);
 	_collisions.get(_doorHModel)->setHitMask(HIT_SOLID_FLAG);
@@ -298,6 +311,7 @@ void MainState::startLevel(const Path& level) {
 
 void MainState::stopGame() {
 	_world.destroy();
+	_hud.destroy();
 
 	_world.release();
 	_player.release();
@@ -440,6 +454,8 @@ void MainState::updateFrame() {
 	window()->swapBuffers();
 	glc->setLogCalls(false);
 
+//	dumpEntities(_entities.root(), 0);
+
 	uint64 now = sys()->getTimeNs();
 	++_fpsCount;
 	if(_fpsCount == FRAMERATE) {
@@ -458,7 +474,7 @@ void MainState::updateTriggers(HitEventQueue& hitQueue, EntityRef useEntity) {
 	if(useEntity.isValid()) {
 		TriggerComponent* tc = _triggers.get(useEntity);
 		if(tc && !tc->onUse.empty())
-			exec(tc->onUse);
+			exec(tc->onUse, useEntity);
 	}
 
 	for(TriggerComponent& tc: _triggers) {
@@ -485,9 +501,9 @@ void MainState::updateTriggers(HitEventQueue& hitQueue, EntityRef useEntity) {
 	for(TriggerComponent& tc: _triggers) {
 		if(tc.isEnabled() && tc.entity().isEnabledRec()) {
 			if(!tc.prevInside && tc.inside && !tc.onEnter.empty())
-				exec(tc.onEnter);
+				exec(tc.onEnter, tc.entity());
 			if(tc.prevInside && !tc.inside && !tc.onExit.empty())
-				exec(tc.onExit);
+				exec(tc.onExit, tc.entity());
 		}
 	}
 }
@@ -524,7 +540,7 @@ bool MainState::hasItem(Item item) {
 
 void MainState::addToInventory(Item item) {
 	dbgLogger.info("Add item ", item);
-	EntityRef entity = _entities.cloneEntity(_itemModel, _hud);
+	EntityRef entity = _entities.cloneEntity(_itemHudModel, _hud);
 	_sprites.get(entity)->setTileIndex(item);
 	_inventorySlots.push_back(entity);
 }
