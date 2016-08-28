@@ -77,6 +77,10 @@ int pickupItem(MainState* state, EntityRef self, int argc, const char** argv) {
 		dbgLogger.warning("pickupItem: self is not set.");
 		return -2;
 	}
+	if(argc != 1) {
+		dbgLogger.warning("pickupItem: wrong number of argument.");
+		return -2;
+	}
 
 	SpriteComponent* sc = state->_sprites.get(self);
 	if(!sc) {
@@ -88,6 +92,25 @@ int pickupItem(MainState* state, EntityRef self, int argc, const char** argv) {
 	state->addToInventory(Item(item));
 
 	self.setEnabled(false);
+
+	return 0;
+}
+
+
+int message(MainState* state, EntityRef self, int argc, const char** argv) {
+	if(argc != 2) {
+		dbgLogger.warning("message: wrong number of argument.");
+		return -2;
+	}
+
+	const Json::Value& messages = state->_messages.get(argv[1], Json::nullValue);
+	if(!messages.isArray()) {
+		dbgLogger.warning("message: invalid message identifier \"", argv[1], "\"");
+		return -2;
+	}
+
+	for(const Json::Value& msg: messages)
+		state->enqueueMessage(msg.asString());
 
 	return 0;
 }

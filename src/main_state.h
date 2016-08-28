@@ -153,6 +153,7 @@ public:
 	SlotTracker _slotTracker;
 
 	CommandMap  _commands;
+	Json::Value _messages;
 	std::deque<std::string> _messageQueue;
 	OrthographicCamera _camera;
 

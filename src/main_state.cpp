@@ -90,6 +90,7 @@ MainState::MainState(Game* game)
 
 	_commands["switch"]      = switchDoorCommand;
 	_commands["pickup_item"] = pickupItem;
+	_commands["message"]     = message;
 }
 
 
@@ -137,10 +138,12 @@ void MainState::initialize() {
 
 	registerLevel("lvl_0.json");
 
+	parseJson(_messages, loader()->realFromLogic("text.json"), "text.json", dbgLogger);
+
 	_models = _entities.createEntity(_entities.root(), "models");
 	_models.setEnabled(false);
 
-	loader()->load<BitmapFontLoader>("droid_sans_24.json");
+	loader()->load<BitmapFontLoader>("font.json");
 
 	loader()->load<TileMapLoader>("lvl_0.json");
 
@@ -252,6 +255,7 @@ void MainState::exec(const std::string& cmd, EntityRef self) {
 
 int MainState::exec(int argc, const char** argv, EntityRef self) {
 	lairAssert(argc > 0);
+	echoCommand(this, self, argc, argv);
 	auto cmd = _commands.find(argv[0]);
 	if(cmd == _commands.end()) {
 		dbgLogger.warning("Unknown command \"", argv[0], "\"");
@@ -292,7 +296,7 @@ void MainState::startGame() {
 	_dialogText = _entities.createEntity(_dialogBox, "dialog_text");
 	_dialogText.place(Vector3(margin - 570, 300 - margin - 5, .1));
 	BitmapTextComponent* dialogText = _texts.addComponent(_dialogText);
-	dialogText->setFont("droid_sans_24.json");
+	dialogText->setFont("font.json");
 	dialogText->setAnchor(Vector2(0, 1));
 	dialogText->setColor(Vector4(.32, .295, .16, 1));
 	dialogText->setSize(Vector2i(1140 - 2 * margin, 300 - 2 * margin));

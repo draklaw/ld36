@@ -45,5 +45,7 @@ int switchDoorCommand(MainState* state, EntityRef self, int argc, const char** a
 
 int pickupItem(MainState* state, EntityRef self, int argc, const char** argv);
 
+int message(MainState* state, EntityRef self, int argc, const char** argv);
+
 
 #endif
