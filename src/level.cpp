@@ -22,6 +22,7 @@
 
 
 #include "main_state.h"
+#include "commands.h"
 
 #include "level.h"
 
@@ -107,6 +108,7 @@ void Level::initialize() {
 	_tileMap = aspect->get();
 	lairAssert(_tileMap);
 
+	_entityMap.clear();
 	if(_levelRoot.isValid())
 		_levelRoot.destroy();
 	_levelRoot = _mainState->_entities.createEntity(_mainState->_entities.root());
@@ -120,8 +122,12 @@ void Level::initialize() {
 			std::string name = obj.get("name", "<no_name>").asString();
 
 			EntityRef entity;
-			if(type == "trigger")
+			if(type == "trigger") {
 				entity = createTrigger(obj, name);
+			}
+			if(type == "door") {
+				entity = createDoor(obj, name);
+			}
 			else if(type == "spawn") {
 				_spawnPoint = objectBox(obj).center();
 			}
@@ -152,11 +158,10 @@ Box2 Level::objectBox(const Json::Value& obj) const {
 	try {
 		Json::Value props = obj["properties"];
 
-		float margin = props.get("margin", 0.).asFloat();
-		Vector2 min(obj["x"].asFloat() + margin,
-		            obj["y"].asFloat() + margin);
-		Vector2 max(min(0) + obj["width"] .asFloat() - 2 * margin,
-		            min(1) + obj["height"].asFloat() - 2 * margin);
+		Vector2 min(obj["x"].asFloat(),
+		            obj["y"].asFloat());
+		Vector2 max(min(0) + obj["width"] .asFloat(),
+		            min(1) + obj["height"].asFloat());
 
 		float height = _tileMap->height(0) * TILE_SIZE;
 		return flipY(Box2(min, max), height);
@@ -173,14 +178,54 @@ EntityRef Level::createLayer(unsigned index, const char* name) {
 	TileLayerComponent* lc = _mainState->_tileLayers.addComponent(layer);
 	lc->setTileMap(_tileMap);
 	lc->setLayerIndex(index);
-	layer.place(Vector3(0, 0, .1 * index));
+	layer.place(Vector3(0, 0, .01 * index));
 	return layer;
 }
 
 
 EntityRef Level::createTrigger(const Json::Value &obj, const std::string& name) {
+	Json::Value props = obj.get("properties", Json::Value());
+
 	Box2 box = objectBox(obj);
-	EntityRef entity = _mainState->createTrigger(_levelRoot, name.c_str(), box);
+	float margin = -props.get("margin", 0).asFloat();
+	Vector2 marginVec(margin, margin);
+	Box2 hitBox(marginVec, box.sizes() - 2 * marginVec);
+
+	EntityRef entity = _mainState->createTrigger(_levelRoot, name.c_str(), hitBox);
+	entity.place((Vector3() << box.min(), 0.09).finished());
+
+
+	TriggerComponent* tc = _mainState->_triggers.addComponent(entity);
+	tc->onEnter = props.get("on_enter", "").asString();
+	tc->onExit  = props.get("on_exit",  "").asString();
+	tc->onUse   = props.get("on_use",   "").asString();
+
+	std::string sprite = props.get("sprite", "").asString();
+	if(!sprite.empty()) {
+		SpriteComponent* sc = _mainState->_sprites.addComponent(entity);
+		sc->setTexture(sprite);
+		sc->setTileIndex(props.get("tile_index", 0).asInt());
+		sc->setTileGridSize(Vector2i(4, 2));
+		sc->setAnchor(Vector2(0, 0));
+		sc->setBlendingMode(BLEND_ALPHA);
+	}
+
+	return entity;
+}
+
+
+EntityRef Level::createDoor(const Json::Value& obj, const std::string& name) {
+	Json::Value props = obj.get("properties", Json::Value());
+	Box2 box = objectBox(obj);
+	bool horizontal = props.get("horizontal", true).asBool();
+	bool open = props.get("open", false).asBool();
+
+	EntityRef model = horizontal? _mainState->_doorHModel: _mainState->_doorVModel;
+	EntityRef entity = _mainState->_entities.cloneEntity(model, _levelRoot, name.c_str());
+
+	entity.place((Vector3() << box.min(), .2).finished());
+	setDoorOpen(_mainState, entity, open);
+
 	return entity;
 }
 

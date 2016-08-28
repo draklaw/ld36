@@ -1,0 +1,14 @@
+{
+    "name": "door_v",
+    "sprite": {
+        "sprite":  "door_v.png",
+        "h_tiles": 2,
+        "v_tiles": 1,
+        "index":   0,
+        "anchor":  [ 0, 0 ],
+        "blend":   "alpha"
+    },
+    "collision": {
+        "abox": [ 0, 0, 96, 144 ]
+    }
+}

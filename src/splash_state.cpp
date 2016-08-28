@@ -162,7 +162,7 @@ void SplashState::updateTick() {
 		quit();
 	}
 
-	_entities.updateWorldTransform();
+	_entities.updateWorldTransforms();
 }
 
 

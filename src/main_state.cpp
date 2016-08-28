@@ -28,6 +28,7 @@
 #include "game.h"
 #include "splash_state.h"
 #include "level.h"
+#include "commands.h"
 
 #include "main_state.h"
 
@@ -44,6 +45,8 @@ MainState::MainState(Game* game)
       _texts(loader(), &_mainPass, &_spriteRenderer),
       _tileLayers(&_mainPass, &_spriteRenderer),
       _collisions(),
+
+      _triggers("trigger", 128),
 
       _inputs(sys(), &log()),
 
@@ -70,8 +73,11 @@ MainState::MainState(Game* game)
 	// will be more easily accessible.
 	_entities.registerComponentManager(&_sprites);
 	_entities.registerComponentManager(&_collisions);
+	_entities.registerComponentManager(&_triggers);
 	_entities.registerComponentManager(&_texts);
 	_entities.registerComponentManager(&_tileLayers);
+
+	_commands["switch"] = switchDoorCommand;
 }
 
 
@@ -129,10 +135,16 @@ void MainState::initialize() {
 	loader()->load<ImageLoader>("dialog_box.png");
 
 	_playerModel = loadEntity("player.json", _models);
-	_collisions.get(_playerModel)->setHitMask(HIT_PLAYER_FLAG);
+	_collisions.get(_playerModel)->setHitMask(HIT_PLAYER_FLAG | HIT_SOLID_FLAG);
 
 	_itemModel = loadEntity("item.json", _models);
 	_collisions.get(_itemModel)->setHitMask(HIT_PLAYER_FLAG | HIT_TRIGGER_FLAG | HIT_USE_FLAG);
+
+	_doorHModel = loadEntity("door_h.json", _models);
+	_collisions.get(_doorHModel)->setHitMask(HIT_SOLID_FLAG);
+
+	_doorVModel = loadEntity("door_v.json", _models);
+	_collisions.get(_doorVModel)->setHitMask(HIT_SOLID_FLAG);
 
 	loader()->waitAll();
 
@@ -188,6 +200,50 @@ void MainState::registerLevel(const Path& path) {
 	LevelSP level = std::make_shared<Level>(this, path);
 	level->preload();
 	_levels.emplace(path, level);
+}
+
+
+void MainState::exec(const std::string& cmd, EntityRef self) {
+#define MAX_CMD_ARGS 32
+
+	std::string tokens = cmd;
+	unsigned    size   = tokens.size();
+	for(int ci = 0; ci < size; ) {
+		int   argc = 0;
+		const char* argv[MAX_CMD_ARGS];
+		while(ci < size) {
+			bool endLine = false;
+			while(ci < size && std::isspace(tokens[ci])) {
+				endLine = tokens[ci] == '\n';
+				tokens[ci] = '\0';
+				++ci;
+			}
+			if(endLine)
+				break;
+
+			argv[argc] = tokens.data() + ci;
+			++argc;
+
+			while(ci < size && !std::isspace(tokens[ci])) {
+				++ci;
+			}
+		}
+
+		if(argc) {
+			exec(argc, argv, self);
+		}
+	}
+}
+
+
+int MainState::exec(int argc, const char** argv, EntityRef self) {
+	lairAssert(argc > 0);
+	auto cmd = _commands.find(argv[0]);
+	if(cmd == _commands.end()) {
+		dbgLogger.warning("Unknown command \"", argv[0], "\"");
+		return -1;
+	}
+	return cmd->second(this, self, argc, argv);
 }
 
 
@@ -264,6 +320,8 @@ void MainState::updateTick() {
 		startGame();
 	}
 
+	_entities.setPrevWorldTransforms();
+
 	if(_messageQueue.empty()) {
 		// Player movement
 		Vector2 offset(0, 0);
@@ -283,23 +341,11 @@ void MainState::updateTick() {
 
 		_level->computeCollisions();
 
-		CollisionComponent* pColl = _collisions.get(_player);
-		Vector2  bump(0, 0);
-		bump(0) += std::max(0.01f + pColl->penetration(LEFT),  0.f);
-		bump(0) -= std::max(0.01f + pColl->penetration(RIGHT), 0.f);
-		bump(1) += std::max(0.01f + pColl->penetration(DOWN),  0.f);
-		bump(1) -= std::max(0.01f + pColl->penetration(UP),    0.f);
-		_player.translate(bump);
-
-		// WARNING: returning early might skip updateWorldTransform.
-		// Update world transform before level logic so that collision match
-		_entities.updateWorldTransform();
-
 		// Level logic
 		HitEventQueue hitQueue;
 		_collisions.findCollisions(hitQueue);
-	//	for(const HitEvent& hit: hitQueue)
-	//		dbgLogger.debug("hit: ", hit.entities[0].name(), ", ", hit.entities[1].name());
+//		for(const HitEvent& hit: hitQueue)
+//			dbgLogger.debug("hit: ", hit.entities[0].name(), ", ", hit.entities[1].name());
 
 		EntityRef useEntity;
 		if(_useInput->justPressed()) {
@@ -311,13 +357,33 @@ void MainState::updateTick() {
 				dbgLogger.debug("use: ", useEntity.name());
 			}
 		}
-	}
-	else {
-		if(_useInput->justPressed())
-			nextMessage();
 
-		_entities.updateWorldTransform();
+		updateTriggers(hitQueue, useEntity);
+
+		// Bump player
+		for(HitEvent& hit: hitQueue) {
+			CollisionComponent* cc = _collisions.get(hit.entities[1]);
+			if(cc && hit.entities[0] == _player && cc->hitMask() & HIT_SOLID_FLAG) {
+				CollisionComponent* pcc = _collisions.get(_player);
+				updatePenetration(pcc, pcc->worldAlignedBox(), cc->worldAlignedBox());
+			}
+		}
+
+		CollisionComponent* pColl = _collisions.get(_player);
+		Vector2  bump(0, 0);
+		bump(0) += std::max(0.01f + pColl->penetration(LEFT),  0.f);
+		bump(0) -= std::max(0.01f + pColl->penetration(RIGHT), 0.f);
+		bump(1) += std::max(0.01f + pColl->penetration(DOWN),  0.f);
+		bump(1) -= std::max(0.01f + pColl->penetration(UP),    0.f);
+		_player.translate(bump);
+
 	}
+	else if(_useInput->justPressed()) {
+			nextMessage();
+	}
+
+	// WARNING: returning early might skip updateWorldTransform.
+	_entities.updateWorldTransforms();
 }
 
 
@@ -339,19 +405,19 @@ void MainState::updateFrame() {
 	hudTrans.translate(Vector3(viewBox.min()));
 	hudTrans.scale(hudScale);
 	_hud.place(hudTrans);
-	_hud.resetPrevWorldTransform();
+	_hud.setPrevWorldTransform();
 
 	_dialogBox.place(Vector3(hudWidth / 2, 40, .8));
-	_dialogBox.resetPrevWorldTransform();
+	_dialogBox.setPrevWorldTransform();
 
 	_dialogText.updateWorldTransform();
-	_dialogText.resetPrevWorldTransform();
+	_dialogText.setPrevWorldTransform();
 
 	for(int i=0; i < _inventorySlots.size(); ++i) {
 		EntityRef item = _inventorySlots[i];
 		item.place(Vector3(48 + 80 * i, hudHeight - 48, 0.8));
 		item.updateWorldTransform();
-		item.resetPrevWorldTransform();
+		item.setPrevWorldTransform();
 	}
 
 	renderer()->uploadPendingTextures();
@@ -383,6 +449,47 @@ void MainState::updateFrame() {
 	}
 
 	_prevFrameTime = _loop.frameTime();
+}
+
+
+void MainState::updateTriggers(HitEventQueue& hitQueue, EntityRef useEntity) {
+	_triggers.compactArray();
+
+	if(useEntity.isValid()) {
+		TriggerComponent* tc = _triggers.get(useEntity);
+		if(tc && !tc->onUse.empty())
+			exec(tc->onUse);
+	}
+
+	for(TriggerComponent& tc: _triggers) {
+		if(tc.isEnabled() && tc.entity().isEnabledRec()) {
+			tc.prevInside = tc.inside;
+			tc.inside = false;
+		}
+	}
+
+	for(HitEvent& hit: hitQueue) {
+		if(hit.entities[1] == _player) {
+			std::swap(hit.entities[0], hit.entities[1]);
+			std::swap(hit.boxes[0],    hit.boxes[1]);
+		}
+
+		if(hit.entities[0] == _player) {
+			TriggerComponent* tc = _triggers.get(hit.entities[1]);
+			if(tc) {
+				tc->inside = true;
+			}
+		}
+	}
+
+	for(TriggerComponent& tc: _triggers) {
+		if(tc.isEnabled() && tc.entity().isEnabledRec()) {
+			if(!tc.prevInside && tc.inside && !tc.onEnter.empty())
+				exec(tc.onEnter);
+			if(tc.prevInside && !tc.inside && !tc.onExit.empty())
+				exec(tc.onExit);
+		}
+	}
 }
 
 
@@ -439,10 +546,12 @@ void MainState::removeFromInventory(Item item) {
 
 EntityRef MainState::createTrigger(EntityRef parent, const char* name, const Box2& box) {
 	EntityRef entity = _entities.createEntity(parent, name);
+
 	CollisionComponent* cc = _collisions.addComponent(entity);
 	cc->setShape(Shape::newAlignedBox(box));
 	cc->setHitMask(HIT_PLAYER_FLAG | HIT_TRIGGER_FLAG | HIT_USE_FLAG);
 	cc->setIgnoreMask(HIT_TRIGGER_FLAG);
+
 	return entity;
 }
 

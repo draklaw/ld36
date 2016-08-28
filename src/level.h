@@ -31,6 +31,7 @@
 #include <lair/utils/tile_map.h>
 
 #include <lair/ec/entity.h>
+#include <lair/ec/collision_component.h>
 
 
 using namespace lair;
@@ -41,6 +42,7 @@ class MainState;
 
 bool isSolid(TileMap::TileIndex tile);
 Vector2i cellCoord(const Vector2& pos, float height);
+void updatePenetration(CollisionComponent* comp, const Box2& objBox, const Box2& otherBox);
 
 Box2 flipY(const Box2& box, float height);
 
@@ -69,6 +71,7 @@ public:
 
 	EntityRef createLayer(unsigned index, const char* name);
 	EntityRef createTrigger(const Json::Value& obj, const std::string& name);
+	EntityRef createDoor(const Json::Value& obj, const std::string& name);
 
 	const Path& path() { return _path; }
 	TileMapSP   tileMap() { return _tileMap; }

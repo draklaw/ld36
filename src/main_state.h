@@ -41,6 +41,8 @@
 #include <lair/ec/tile_layer_component.h>
 #include <lair/ec/collision_component.h>
 
+#include "components.h"
+
 
 #define ONE_SEC (1000000000)
 
@@ -57,6 +59,7 @@
 #define HIT_PLAYER_FLAG  0x01
 #define HIT_TRIGGER_FLAG 0x02
 #define HIT_USE_FLAG     0x04
+#define HIT_SOLID_FLAG   0x08
 
 
 using namespace lair;
@@ -78,6 +81,9 @@ enum Item {
 
 typedef std::unordered_map<Path, LevelSP, boost::hash<Path>> LevelMap;
 
+typedef int (*Command)(MainState* state, EntityRef self, int argc, const char** argv);
+typedef std::unordered_map<std::string, Command> CommandMap;
+
 
 class MainState : public GameState {
 public:
@@ -93,6 +99,8 @@ public:
 	Game* game();
 
 	void registerLevel(const Path& path);
+	void exec(const std::string& cmd, EntityRef self = EntityRef());
+	int exec(int argc, const char** argv, EntityRef self = EntityRef());
 
 	void startGame();
 	void startLevel(const Path& level);
@@ -100,6 +108,8 @@ public:
 
 	void updateTick();
 	void updateFrame();
+
+	void updateTriggers(HitEventQueue& hitQueue, EntityRef useEntity);
 
 	// Game functions
 
@@ -134,13 +144,16 @@ public:
 	BitmapTextComponentManager _texts;
 	TileLayerComponentManager  _tileLayers;
 	CollisionComponentManager  _collisions;
+
+	TriggerComponentManager    _triggers;
 //	AnimationComponentManager  _anims;
+
 	InputManager               _inputs;
 
 	SlotTracker _slotTracker;
 
+	CommandMap  _commands;
 	std::deque<std::string> _messageQueue;
-
 	OrthographicCamera _camera;
 
 	bool       _initialized;
@@ -165,6 +178,8 @@ public:
 	EntityRef _models;
 	EntityRef _playerModel;
 	EntityRef _itemModel;
+	EntityRef _doorHModel;
+	EntityRef _doorVModel;
 
 	// Game entities
 	EntityRef _world;
