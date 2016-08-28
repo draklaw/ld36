@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="17" height="17" tilewidth="48" tileheight="48" nextobjectid="7">
+ <tileset firstgid="1" name="Tilesetv2" tilewidth="48" tileheight="48" tilecount="144" columns="12">
+  <image source="tileset.png" width="576" height="576"/>
+ </tileset>
+ <layer name="Calque de Tile 1" width="17" height="17">
+  <data encoding="csv">
+31,31,31,31,31,67,68,13,13,1,70,71,31,31,31,31,31,
+31,31,31,31,31,67,68,13,13,1,70,71,31,31,31,31,31,
+31,31,43,44,45,129,130,52,53,54,127,128,45,46,47,31,31,
+31,31,55,56,57,141,142,64,65,66,139,140,57,58,59,31,31,
+31,31,67,68,13,13,13,13,13,13,13,13,13,70,71,31,31,
+31,31,67,68,13,13,13,13,13,13,13,13,13,70,71,31,31,
+31,31,67,68,13,13,13,13,13,13,13,13,13,70,71,31,31,
+31,31,67,68,13,13,13,13,13,13,13,13,13,70,71,31,31,
+31,31,67,68,13,13,13,13,13,13,1,13,13,70,71,31,31,
+31,31,67,68,13,13,13,13,13,13,1,13,13,70,71,31,31,
+31,31,67,68,13,1,13,13,13,13,1,13,13,70,71,31,31,
+31,31,67,68,13,13,13,13,13,13,13,13,13,70,71,31,31,
+31,31,67,68,1,13,13,13,13,13,13,13,13,70,71,31,31,
+31,31,79,80,81,105,106,1,1,1,103,104,81,82,83,31,31,
+31,31,91,92,93,117,118,1,1,1,115,116,93,94,95,31,31,
+31,31,31,31,31,67,68,1,1,1,70,71,31,31,31,31,31,
+31,31,31,31,31,67,68,1,1,1,70,71,31,31,31,31,31
+</data>
+ </layer>
+ <objectgroup name="Calque d'objets 1">
+  <object id="1" name="door_red" type="door" x="336" y="96" width="144" height="96">
+   <properties>
+    <property name="horizontal" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="2" name="trigger_red_radio" type="trigger" x="384" y="336" width="48" height="48">
+   <properties>
+    <property name="on_use">message lvl_init_intro 
+ switch door_red
+</property>
+    <property name="sprite" value="items.png"/>
+    <property name="tile_index" type="int" value="7"/>
+   </properties>
+  </object>
+  <object id="3" name="exit" type="trigger" x="336" y="0" width="144" height="48">
+   <properties>
+    <property name="on_enter">next_level lvl_0.json
+</property>
+   </properties>
+  </object>
+  <object id="4" name="spawn" type="spawn" x="384" y="720" width="48" height="48"/>
+ </objectgroup>
+</map>

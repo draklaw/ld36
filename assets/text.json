@@ -3,5 +3,43 @@
         "Voluptatum molestiae laudantium debitis adipisci velit distinctio hic. Omnis maiores sequi cum laboriosam perspiciatis pariatur hic cupiditate. Et ut consequatur beatae ullam repellat facere minima.",
         "Vel eum non quas quis asperiores. Aliquam enim nobis similique nesciunt vitae accusantium. Accusamus exercitationem ipsam reprehenderit ut et. A hic qui sed corporis molestiae cumque. Saepe porro eius et.",
         "Dolorem excepturi molestiae incidunt officia. Fuga non eos maxime aut quasi temporibus autem. Totam eum qui facilis."
-    ]
+    ],
+	
+	"general_intro": [
+		"Several years passed since the Last War. In fact, it would be more like several centuries. The nuclear winter covered the earth with ashes, turned the water brown and made the air so toxic than few of us barely survived.",
+		"Nobody remembers exactly what launched the Last War. Nobody remembers who won it, because in the end, it doesn't matter. There is few records of this period, or the one before : the computers crashed and the various recordings were erased by the nuclear blast.",
+		"The fallouts took centuries to decrease, and the society had to reinvent itself. We wanted to survive.",
+		"On the 15th March 2931, we saw the first mammals outside the troglodyte bunkers that sheltered us. It took some decades before we decided to go outside too. We created some explorer groups, in order to reconquer our world.",
+		"I'm one of these explorers, and even if I lost my group in a sandstorm, I decided to continue. The radio signal I received may come from other survivors..."
+	],
+	
+	"lvl_init_intro" [
+		"If you can hear this record, it means you have recieved the signal of my ship. I need you help.",
+		"",
+		""
+	],
+
+	"lvl_0_intro" [
+		"",
+		"",
+		""
+	],
+
+	"lvl_1_intro" [
+		"",
+		"",
+		""
+	],
+
+	"lvl_2_intro" [
+		"",
+		"",
+		""
+	],
+
+	"lvl_3_intro" [
+		"",
+		"",
+		""
+	]
 }
