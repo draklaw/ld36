@@ -13,31 +13,31 @@
 		"I'm one of these explorers, and even if I lost my group in a sandstorm, I decided to continue. The radio signal I received may come from other survivors..."
 	],
 	
-	"lvl_init_intro" [
-		"If you can hear this record, it means you have recieved the signal of my ship. I need you help.",
-		"",
-		""
+	"lvl_init_intro": [
+		"If you can hear this record, it means you have recieved the signal of my ship. I need you help. I don't know what happened, I've been in artificial sleep with my brothers and sisters, but they left without me. The ship must have had a problem : when I woke up, I was alone, and there were damages onboard.",
+		"I'm not sure how to fix the ship, I didn't found its manual, and the food was missing. So, I put myself back in artificial sleep, hopping my people will help me...",
+		"If you accept to help me, I would need"
 	],
 
-	"lvl_0_intro" [
-		"",
-		"",
-		""
-	],
-
-	"lvl_1_intro" [
+	"lvl_0_intro": [
 		"",
 		"",
 		""
 	],
 
-	"lvl_2_intro" [
+	"lvl_1_intro": [
 		"",
 		"",
 		""
 	],
 
-	"lvl_3_intro" [
+	"lvl_2_intro": [
+		"",
+		"",
+		""
+	],
+
+	"lvl_3_intro": [
 		"",
 		"",
 		""

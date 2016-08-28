@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="17" height="17" tilewidth="48" tileheight="48" nextobjectid="7">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="17" height="17" tilewidth="48" tileheight="48" nextobjectid="13">
  <tileset firstgid="1" name="Tilesetv2" tilewidth="48" tileheight="48" tilecount="144" columns="12">
   <image source="tileset.png" width="576" height="576"/>
  </tileset>
@@ -25,26 +25,26 @@
 </data>
  </layer>
  <objectgroup name="Calque d'objets 1">
-  <object id="1" name="door_red" type="door" x="336" y="96" width="144" height="96">
+  <object id="4" name="spawn" type="spawn" x="384" y="720" width="48" height="48"/>
+  <object id="7" name="door_r" type="door" x="336" y="96" width="144" height="96">
    <properties>
     <property name="horizontal" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="2" name="trigger_red_radio" type="trigger" x="384" y="336" width="48" height="48">
+  <object id="9" name="exit" type="trigger" x="336" y="0" width="144" height="48">
    <properties>
-    <property name="on_use">message lvl_init_intro 
- switch door_red
+    <property name="on_enter">next_level lvl_4.json
 </property>
+   </properties>
+  </object>
+  <object id="10" name="radio_r" type="trigger" x="384" y="336" width="48" height="48">
+   <properties>
+    <property name="on_use">message lvl_init_intro
+switch door_r</property>
     <property name="sprite" value="items.png"/>
     <property name="tile_index" type="int" value="7"/>
+    <property name="tile_v" type="int" value="4"/>
    </properties>
   </object>
-  <object id="3" name="exit" type="trigger" x="336" y="0" width="144" height="48">
-   <properties>
-    <property name="on_enter">next_level lvl_0.json
-</property>
-   </properties>
-  </object>
-  <object id="4" name="spawn" type="spawn" x="384" y="720" width="48" height="48"/>
  </objectgroup>
 </map>

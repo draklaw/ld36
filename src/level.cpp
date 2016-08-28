@@ -214,7 +214,10 @@ EntityRef Level::createTrigger(const Json::Value &obj, const std::string& name) 
 		SpriteComponent* sc = _mainState->_sprites.addComponent(entity);
 		sc->setTexture(sprite);
 		sc->setTileIndex(props.get("tile_index", 0).asInt());
-		sc->setTileGridSize(Vector2i(4, 2));
+		
+		int tileH = props.get("tile_h", 4).asInt();
+		int tileV = props.get("tile_v", 2).asInt();
+		sc->setTileGridSize(Vector2i(tileH, tileV));
 		sc->setAnchor(Vector2(.5, .5));
 		sc->setBlendingMode(BLEND_ALPHA);
 	}

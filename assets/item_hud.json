@@ -2,8 +2,8 @@
     "name": "item_hud",
     "sprite": {
         "sprite":  "items.png",
-        "h_tiles": 3,
-        "v_tiles": 3,
+        "h_tiles": 4,
+        "v_tiles": 4,
         "index":   0,
         "anchor":  [ 0.5, 0.5 ],
         "blend":   "alpha"
