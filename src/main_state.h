@@ -185,6 +185,8 @@ public:
 	// Game entities
 	EntityRef _world;
 	EntityRef _player;
+	Direction _playerDir;
+	float     _playerAnim;
 
 	// HUD entities
 	EntityRef _hud;
@@ -194,6 +196,7 @@ public:
 
 	// Game params
 	float _playerSpeed;
+	float _playerAnimSpeed;
 };
 
 

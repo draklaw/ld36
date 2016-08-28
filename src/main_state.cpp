@@ -77,7 +77,8 @@ MainState::MainState(Game* game)
       _rightInput   (nullptr),
       _useInput     (nullptr),
 
-      _playerSpeed(5)
+      _playerSpeed(5),
+      _playerAnimSpeed(5)
 {
 	// Register the component manager by decreasing importance. The first ones
 	// will be more easily accessible.
@@ -297,6 +298,8 @@ void MainState::startGame() {
 	dialogText->setSize(Vector2i(1140 - 2 * margin, 300 - 2 * margin));
 
 	startLevel("lvl_0.json");
+
+	dbgLogger.info("Entity count: ", _entities.nEntities(), " (", _entities.nZombieEntities(), " zombies)");
 }
 
 
@@ -339,15 +342,24 @@ void MainState::updateTick() {
 	if(_messageQueue.empty()) {
 		// Player movement
 		Vector2 offset(0, 0);
-		if(_upInput->isPressed())
+		if(_upInput->isPressed()) {
 			offset(1) += 1;
-		if(_leftInput->isPressed())
+			_playerDir  = UP;
+		}
+		if(_leftInput->isPressed()) {
 			offset(0) -= 1;
-		if(_downInput->isPressed())
+			_playerDir  = LEFT;
+		}
+		if(_downInput->isPressed()) {
 			offset(1) -= 1;
-		if(_rightInput->isPressed())
+			_playerDir  = DOWN;
+		}
+		if(_rightInput->isPressed()) {
 			offset(0) += 1;
+			_playerDir  = RIGHT;
+		}
 
+		Vector2 lastPlayerPos = _player.translation2();
 		float playerSpeed = _playerSpeed * float(TILE_SIZE) / float(TICKRATE);
 		if(!offset.isApprox(Vector2::Zero())) {
 			_player.translation2() += offset.normalized() * playerSpeed;
@@ -391,6 +403,17 @@ void MainState::updateTick() {
 		bump(1) -= std::max(0.01f + pColl->penetration(UP),    0.f);
 		_player.translate(bump);
 
+		static int playerTileMap[] = { 9, 3, 0, 6 };
+		int playerTile = playerTileMap[_playerDir];
+		if(!_player.translation2().isApprox(lastPlayerPos)) {
+			_playerAnim += _playerAnimSpeed / float(TICKRATE);
+			playerTile += 1 + int(_playerAnim) % 2;
+		}
+		else
+			_playerAnim = 0;
+
+		SpriteComponent* playerSprite = _sprites.get(_player);
+		playerSprite->setTileIndex(playerTile);
 	}
 	else if(_useInput->justPressed()) {
 			nextMessage();

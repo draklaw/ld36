@@ -148,6 +148,8 @@ void Level::start() {
 	dbgLogger.info("Start level ", _path);
 	_levelRoot.setEnabled(true);
 	_mainState->_player.place((Vector3() << _spawnPoint, .1).finished());
+	_mainState->_playerDir = UP;
+	_mainState->_playerAnim = 0;
 }
 
 
