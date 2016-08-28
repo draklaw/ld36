@@ -50,6 +50,7 @@ void setDoorOpen(MainState* state, EntityRef door, bool open) {
 	if(sc && cc) {
 		sc->setTileIndex(open? 0: 1);
 		cc->setEnabled(!open);
+		door.transform()(2, 3) = open? .2: .09;
 	}
 	else {
 		dbgLogger.warning("setDoorOpen: ", door.name(), " do not look like a door.");

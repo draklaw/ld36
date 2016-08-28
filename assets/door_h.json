@@ -5,10 +5,10 @@
         "h_tiles": 1,
         "v_tiles": 2,
         "index":   0,
-        "anchor":  [ 0, 0 ],
+        "anchor":  [ 0.5, 0.5 ],
         "blend":   "alpha"
     },
     "collision": {
-        "abox": [ 0, 0, 144, 96 ]
+        "abox": [ -72, -48, 72, 48 ]
     }
 }

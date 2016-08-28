@@ -250,7 +250,7 @@ EntityRef Level::createDoor(const Json::Value& obj, const std::string& name) {
 	EntityRef model = horizontal? _mainState->_doorHModel: _mainState->_doorVModel;
 	EntityRef entity = _mainState->_entities.cloneEntity(model, _levelRoot, name.c_str());
 
-	entity.place((Vector3() << box.min(), .2).finished());
+	entity.place((Vector3() << box.center(), .2).finished());
 	setDoorOpen(_mainState, entity, open);
 
 	return entity;
