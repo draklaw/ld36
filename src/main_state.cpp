@@ -89,8 +89,11 @@ MainState::MainState(Game* game)
 	_entities.registerComponentManager(&_tileLayers);
 
 	_commands["switch"]      = switchDoorCommand;
-	_commands["pickup_item"] = pickupItem;
-	_commands["message"]     = message;
+	_commands["pickup_item"] = pickupItemCommand;
+	_commands["message"]     = messageCommand;
+	_commands["next_level"]  = nextLevelCommand;
+	_commands["teleport"]    = teleportCommand;
+	_commands["use_object"]  = useObjectCommand;
 }
 
 
@@ -135,8 +138,6 @@ void MainState::initialize() {
 	_inputs.mapScanCode(_useInput,     SDL_SCANCODE_E);
 	_inputs.mapScanCode(_useInput,     SDL_SCANCODE_LCTRL);
 	_inputs.mapScanCode(_useInput,     SDL_SCANCODE_RCTRL);
-
-	registerLevel("lvl_0.json");
 
 	parseJson(_messages, loader()->realFromLogic("text.json"), "text.json", dbgLogger);
 
@@ -265,7 +266,7 @@ int MainState::exec(int argc, const char** argv, EntityRef self) {
 }
 
 
-void MainState::startGame() {
+void MainState::startGame(const Path& firstLevel) {
 	if(_world.isValid()) {
 		stopGame();
 	}
@@ -301,13 +302,28 @@ void MainState::startGame() {
 	dialogText->setColor(Vector4(.32, .295, .16, 1));
 	dialogText->setSize(Vector2i(1140 - 2 * margin, 300 - 2 * margin));
 
-	startLevel("lvl_0.json");
+	startLevel(firstLevel);
 
 	dbgLogger.info("Entity count: ", _entities.nEntities(), " (", _entities.nZombieEntities(), " zombies)");
 }
 
 
 void MainState::startLevel(const Path& level) {
+	if(_levels.count(level) == 0) {
+		registerLevel(level);
+		loader()->waitAll();
+
+		AssetSP asset = assets()->getAsset(level);
+		TileMapAspectSP aspect = asset? asset->aspect<TileMapAspect>(): nullptr;
+		if(!aspect || !aspect->get()) {
+			_levels.erase(level);
+			dbgLogger.error("Failed to load \"", level, "\".");
+			return;
+		}
+
+		_levels[level]->initialize();
+	}
+
 	if(_level)
 		_level->stop();
 
@@ -338,7 +354,7 @@ void MainState::updateTick() {
 		return;
 	}
 	if(_restartInput->justPressed()) {
-		startGame();
+		startGame(game()->firstLevel());
 	}
 	if (sys()->getKeyState(SDL_SCANCODE_F1)) {
 		renderer()->context()->setLogCalls(true);
@@ -498,7 +514,7 @@ void MainState::updateFrame() {
 }
 
 
-void MainState::updateTriggers(HitEventQueue& hitQueue, EntityRef useEntity) {
+void MainState::updateTriggers(HitEventQueue& hitQueue, EntityRef useEntity, bool disableCmds) {
 	_triggers.compactArray();
 
 	if(useEntity.isValid()) {
@@ -528,12 +544,14 @@ void MainState::updateTriggers(HitEventQueue& hitQueue, EntityRef useEntity) {
 		}
 	}
 
-	for(TriggerComponent& tc: _triggers) {
-		if(tc.isEnabled() && tc.entity().isEnabledRec()) {
-			if(!tc.prevInside && tc.inside && !tc.onEnter.empty())
-				exec(tc.onEnter, tc.entity());
-			if(tc.prevInside && !tc.inside && !tc.onExit.empty())
-				exec(tc.onExit, tc.entity());
+	if(!disableCmds) {
+		for(TriggerComponent& tc: _triggers) {
+			if(tc.isEnabled() && tc.entity().isEnabledRec()) {
+				if(!tc.prevInside && tc.inside && !tc.onEnter.empty())
+					exec(tc.onEnter, tc.entity());
+				if(tc.prevInside && !tc.inside && !tc.onExit.empty())
+					exec(tc.onExit, tc.entity());
+			}
 		}
 	}
 }

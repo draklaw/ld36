@@ -49,9 +49,13 @@ public:
 	MainState*   mainState();
 	SplashState* splashState();
 
+	const Path& firstLevel();
+
 protected:
 	std::unique_ptr<SplashState> _splashState;
 	std::unique_ptr<MainState>   _mainState;
+
+	Path _firstLevel;
 };
 
 

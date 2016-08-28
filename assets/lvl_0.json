@@ -453,7 +453,7 @@
                  "name":"exit",
                  "properties":
                     {
-                     "on_enter":"next_level lvl2.json\n"
+                     "on_enter":"next_level lvl_1.json\n"
                     },
                  "propertytypes":
                     {
@@ -503,7 +503,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":31,
+ "nextobjectid":36,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tileheight":48,

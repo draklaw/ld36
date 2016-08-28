@@ -150,6 +150,10 @@ void Level::start() {
 	_mainState->_player.place((Vector3() << _spawnPoint, .1).finished());
 	_mainState->_playerDir = UP;
 	_mainState->_playerAnim = 0;
+
+	HitEventQueue hitQueue;
+	_mainState->_collisions.findCollisions(hitQueue);
+	_mainState->updateTriggers(hitQueue, EntityRef(), true);
 }
 
 
@@ -192,12 +196,12 @@ EntityRef Level::createTrigger(const Json::Value &obj, const std::string& name) 
 	Json::Value props = obj.get("properties", Json::Value());
 
 	Box2 box = objectBox(obj);
-	float margin = -props.get("margin", 0).asFloat();
-	Vector2 marginVec(margin, margin);
-	Box2 hitBox(marginVec, box.sizes() - 2 * marginVec);
+	float margin = props.get("margin", 0).asFloat();
+	Vector2 half = box.sizes() / 2 + Vector2(margin, margin);
+	Box2 hitBox(-half, half);
 
 	EntityRef entity = _mainState->createTrigger(_levelRoot, name.c_str(), hitBox);
-	entity.place((Vector3() << box.min(), 0.08).finished());
+	entity.place((Vector3() << box.center(), 0.08).finished());
 
 
 	TriggerComponent* tc = _mainState->_triggers.addComponent(entity);
@@ -211,7 +215,7 @@ EntityRef Level::createTrigger(const Json::Value &obj, const std::string& name) 
 		sc->setTexture(sprite);
 		sc->setTileIndex(props.get("tile_index", 0).asInt());
 		sc->setTileGridSize(Vector2i(4, 2));
-		sc->setAnchor(Vector2(0, 0));
+		sc->setAnchor(Vector2(.5, .5));
 		sc->setBlendingMode(BLEND_ALPHA);
 	}
 

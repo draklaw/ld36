@@ -43,9 +43,15 @@ bool isDoorOpen(MainState* state, EntityRef door);
 void setDoorOpen(MainState* state, EntityRef door, bool open);
 int switchDoorCommand(MainState* state, EntityRef self, int argc, const char** argv);
 
-int pickupItem(MainState* state, EntityRef self, int argc, const char** argv);
+int pickupItemCommand(MainState* state, EntityRef self, int argc, const char** argv);
 
-int message(MainState* state, EntityRef self, int argc, const char** argv);
+int messageCommand(MainState* state, EntityRef self, int argc, const char** argv);
+
+int nextLevelCommand(MainState* state, EntityRef self, int argc, const char** argv);
+
+int teleportCommand(MainState* state, EntityRef self, int argc, const char** argv);
+
+int useObjectCommand(MainState* state, EntityRef self, int argc, const char** argv);
 
 
 #endif

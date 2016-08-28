@@ -102,14 +102,14 @@ public:
 	void exec(const std::string& cmd, EntityRef self = EntityRef());
 	int exec(int argc, const char** argv, EntityRef self = EntityRef());
 
-	void startGame();
+	void startGame(const Path& firstLevel);
 	void startLevel(const Path& level);
 	void stopGame();
 
 	void updateTick();
 	void updateFrame();
 
-	void updateTriggers(HitEventQueue& hitQueue, EntityRef useEntity);
+	void updateTriggers(HitEventQueue& hitQueue, EntityRef useEntity, bool disableCmds = false);
 
 	// Game functions
 

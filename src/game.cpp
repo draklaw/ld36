@@ -33,7 +33,12 @@
 Game::Game(int argc, char** argv)
     : GameBase(argc, argv),
       _mainState(),
-      _splashState() {
+      _splashState(),
+      _firstLevel("lvl_0.json") {
+
+	if(argc == 2) {
+		_firstLevel = argv[1];
+	}
 }
 
 
@@ -55,7 +60,7 @@ void Game::initialize() {
 //	_splashState->setup(_mainState.get(), "titlescreen.png", 3);
 
 	_mainState->initialize();
-	_mainState->startGame();
+	_mainState->startGame(_firstLevel);
 
 //	AssetSP music = _loader->loadAsset<MusicLoader>("shapeout.ogg");
 //	_loader->waitAll();
@@ -82,4 +87,9 @@ MainState* Game::mainState() {
 
 SplashState* Game::splashState() {
 	return _splashState.get();
+}
+
+
+const Path& Game::firstLevel() {
+	return _firstLevel;
 }

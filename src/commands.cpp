@@ -72,19 +72,19 @@ int switchDoorCommand(MainState* state, EntityRef self, int argc, const char** a
 }
 
 
-int pickupItem(MainState* state, EntityRef self, int argc, const char** argv) {
+int pickupItemCommand(MainState* state, EntityRef self, int argc, const char** argv) {
 	if(!self.isValid()) {
-		dbgLogger.warning("pickupItem: self is not set.");
+		dbgLogger.warning("pickupItemCommand: self is not set.");
 		return -2;
 	}
 	if(argc != 1) {
-		dbgLogger.warning("pickupItem: wrong number of argument.");
+		dbgLogger.warning("pickupItemCommand: wrong number of argument.");
 		return -2;
 	}
 
 	SpriteComponent* sc = state->_sprites.get(self);
 	if(!sc) {
-		dbgLogger.warning("pickupItem: ", self.name(), " do not look like an item.");
+		dbgLogger.warning("pickupItemCommand: ", self.name(), " do not look like an item.");
 		return -2;
 	}
 
@@ -97,20 +97,73 @@ int pickupItem(MainState* state, EntityRef self, int argc, const char** argv) {
 }
 
 
-int message(MainState* state, EntityRef self, int argc, const char** argv) {
+int messageCommand(MainState* state, EntityRef self, int argc, const char** argv) {
 	if(argc != 2) {
-		dbgLogger.warning("message: wrong number of argument.");
+		dbgLogger.warning("messageCommand: wrong number of argument.");
 		return -2;
 	}
 
 	const Json::Value& messages = state->_messages.get(argv[1], Json::nullValue);
 	if(!messages.isArray()) {
-		dbgLogger.warning("message: invalid message identifier \"", argv[1], "\"");
+		dbgLogger.warning("messageCommand: invalid message identifier \"", argv[1], "\"");
 		return -2;
 	}
 
 	for(const Json::Value& msg: messages)
 		state->enqueueMessage(msg.asString());
+
+	return 0;
+}
+
+
+int nextLevelCommand(MainState* state, EntityRef self, int argc, const char** argv) {
+	if(argc != 2) {
+		dbgLogger.warning("nextLevelCommand: wrong number of argument.");
+		return -2;
+	}
+
+	state->startLevel(argv[1]);
+
+	return 0;
+}
+
+
+int teleportCommand(MainState* state, EntityRef self, int argc, const char** argv) {
+	if(argc != 2) {
+		dbgLogger.warning("teleportCommand: wrong number of argument.");
+		return -2;
+	}
+
+	EntityRef target = state->_level->entity(argv[1]);
+	if(!target.isValid()) {
+		dbgLogger.warning("teleportCommand: target \"", target.name(), "\" not found.");
+		return -2;
+	}
+
+	float depth = state->_player.transform()(2, 3);
+	state->_player.place((Vector3() << target.translation2(), depth).finished());
+
+	TriggerComponent* tc = state->_triggers.get(target);
+	if(tc) {
+		tc->inside = true;
+		tc->prevInside = true;
+	}
+
+	return 0;
+}
+
+
+int useObjectCommand(MainState* state, EntityRef self, int argc, const char** argv) {
+	if(argc < 3) {
+		dbgLogger.warning("useObjectCommand: wrong number of argument.");
+		return -2;
+	}
+
+	Item item = Item(std::atoi(argv[1]));
+	if(state->hasItem(item)) {
+		state->removeFromInventory(item);
+		state->exec(argc - 2, argv + 2, self);
+	}
 
 	return 0;
 }
