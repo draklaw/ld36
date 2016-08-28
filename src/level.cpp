@@ -111,7 +111,7 @@ void Level::initialize() {
 	_entityMap.clear();
 	if(_levelRoot.isValid())
 		_levelRoot.destroy();
-	_levelRoot = _mainState->_entities.createEntity(_mainState->_world, _path.native().c_str());
+	_levelRoot = _mainState->_entities.createEntity(_mainState->_world, _path.utf8CStr());
 	_levelRoot.setEnabled(false);
 
 	_baseLayer = createLayer(0, "layer_base");

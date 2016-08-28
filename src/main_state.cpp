@@ -340,6 +340,9 @@ void MainState::updateTick() {
 	if(_restartInput->justPressed()) {
 		startGame();
 	}
+	if (sys()->getKeyState(SDL_SCANCODE_F1)) {
+		renderer()->context()->setLogCalls(true);
+	}
 
 	_entities.setPrevWorldTransforms();
 
