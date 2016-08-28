@@ -103,7 +103,7 @@ public:
 	int exec(int argc, const char** argv, EntityRef self = EntityRef());
 
 	void startGame(const Path& firstLevel);
-	void startLevel(const Path& level);
+	void startLevel(const Path& level, const std::string& spawn = "spawn");
 	void stopGame();
 
 	void updateTick();

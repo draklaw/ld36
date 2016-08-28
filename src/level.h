@@ -64,7 +64,7 @@ public:
 	void preload();
 	void initialize();
 
-	void start();
+	void start(const std::string& spawn);
 	void stop();
 
 	Box2 objectBox(const Json::Value& obj) const;
@@ -90,8 +90,6 @@ protected:
 	EntityRef  _levelRoot;
 	EntityRef  _baseLayer;
 	EntityMap  _entityMap;
-
-	Vector2    _spawnPoint;
 
 public:
 	struct EntityRange {

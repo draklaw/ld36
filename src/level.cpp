@@ -132,7 +132,8 @@ void Level::initialize() {
 				entity = createDoor(obj, name);
 			}
 			else if(type == "spawn") {
-				_spawnPoint = objectBox(obj).center();
+				entity = _mainState->_entities.createEntity(_levelRoot, name.c_str());
+				entity.translation2() = objectBox(obj).center();
 			}
 
 			if(!entity.isValid() && type != "spawn")
@@ -144,12 +145,13 @@ void Level::initialize() {
 }
 
 
-void Level::start() {
+void Level::start(const std::string& spawn) {
 	dbgLogger.info("Start level ", _path);
 	_levelRoot.setEnabled(true);
-	_mainState->_player.place((Vector3() << _spawnPoint, .1).finished());
-	_mainState->_playerDir = UP;
-	_mainState->_playerAnim = 0;
+
+	EntityRef spawnEntity = entity(spawn);
+	if(spawnEntity.isValid())
+		_mainState->_player.place((Vector3() << spawnEntity.translation2(), .1).finished());
 
 	HitEventQueue hitQueue;
 	_mainState->_collisions.findCollisions(hitQueue);

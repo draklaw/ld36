@@ -277,7 +277,8 @@ void MainState::startGame(const Path& firstLevel) {
 	_world = _entities.createEntity(_entities.root(), "world");
 
 	_player = _entities.cloneEntity(_playerModel, _world);
-	_player.place(Vector3(70, 70, .1));
+	_playerDir  = UP;
+	_playerAnim = 0;
 
 	for(auto item: _levels) {
 		item.second->initialize();
@@ -308,7 +309,7 @@ void MainState::startGame(const Path& firstLevel) {
 }
 
 
-void MainState::startLevel(const Path& level) {
+void MainState::startLevel(const Path& level, const std::string& spawn) {
 	if(_levels.count(level) == 0) {
 		registerLevel(level);
 		loader()->waitAll();
@@ -328,7 +329,7 @@ void MainState::startLevel(const Path& level) {
 		_level->stop();
 
 	_level = _levels[level];
-	_level->start();
+	_level->start(spawn);
 }
 
 
