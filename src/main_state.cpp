@@ -27,27 +27,9 @@
 
 #include "game.h"
 #include "splash_state.h"
-#include "level_logic.h"
+#include "level.h"
 
 #include "main_state.h"
-
-
-#define ONE_SEC (1000000000)
-
-//FIXME?
-#define SCREEN_WIDTH  1920
-#define SCREEN_HEIGHT 1080
-
-#define FRAMERATE 60
-#define TICKRATE  60
-
-#define TILE_SIZE       48
-#define TILE_SET_WIDTH  2
-#define TILE_SET_HEIGHT 2
-
-#define HIT_PLAYER_FLAG  0x01
-#define HIT_TRIGGER_FLAG 0x02
-#define HIT_USE_FLAG     0x04
 
 
 MainState::MainState(Game* game)
@@ -82,7 +64,7 @@ MainState::MainState(Game* game)
       _rightInput   (nullptr),
       _useInput     (nullptr),
 
-      _playerSpeed(3)
+      _playerSpeed(5)
 {
 	// Register the component manager by decreasing importance. The first ones
 	// will be more easily accessible.
@@ -135,14 +117,14 @@ void MainState::initialize() {
 	_inputs.mapScanCode(_useInput,     SDL_SCANCODE_LCTRL);
 	_inputs.mapScanCode(_useInput,     SDL_SCANCODE_RCTRL);
 
-	fillLevelLogicMap(_levelLogicMap);
+	registerLevel("lvl_0.json");
 
 	_models = _entities.createEntity(_entities.root(), "models");
 	_models.setEnabled(false);
 
 	loader()->load<BitmapFontLoader>("droid_sans_24.json");
 
-	loader()->load<TileMapLoader>("map_test.json");
+	loader()->load<TileMapLoader>("lvl_0.json");
 
 	loader()->load<ImageLoader>("dialog_box.png");
 
@@ -202,26 +184,29 @@ Game* MainState::game() {
 }
 
 
+void MainState::registerLevel(const Path& path) {
+	LevelSP level = std::make_shared<Level>(this, path);
+	level->preload();
+	_levels.emplace(path, level);
+}
+
+
 void MainState::startGame() {
 	if(_world.isValid()) {
 		stopGame();
 	}
 
+	_messageQueue.clear();
+	_inventorySlots.clear();
+
 	_world = _entities.createEntity(_entities.root(), "world");
-
-	_baseLayer = _entities.createEntity(_world, "base_layer");
-	TileLayerComponent* baseLayer = _tileLayers.addComponent(_baseLayer);
-	_tileMap = assets()->getAsset("map_test.json")->aspect<TileMapAspect>()->get();
-	baseLayer->setTileMap(_tileMap);
-	_baseLayer.place(Vector3(0, 0, 0));
-
-	// TODO: load level (should place _player)
 
 	_player = _entities.cloneEntity(_playerModel, _world);
 	_player.place(Vector3(70, 70, .1));
 
-	createTrigger(_world, "test_trigger", Box2(Vector2(1*TILE_SIZE, 1*TILE_SIZE),
-	                                           Vector2(5*TILE_SIZE, 3*TILE_SIZE)));
+	for(auto item: _levels) {
+		item.second->initialize();
+	}
 
 	_hud = _entities.createEntity(_entities.root(), "hud");
 
@@ -241,6 +226,17 @@ void MainState::startGame() {
 	dialogText->setAnchor(Vector2(0, 1));
 	dialogText->setColor(Vector4(.32, .295, .16, 1));
 	dialogText->setSize(Vector2i(1140 - 2 * margin, 300 - 2 * margin));
+
+	startLevel("lvl_0.json");
+}
+
+
+void MainState::startLevel(const Path& level) {
+	if(_level)
+		_level->stop();
+
+	_level = _levels[level];
+	_level->start();
 }
 
 
@@ -248,10 +244,12 @@ void MainState::stopGame() {
 	_world.destroy();
 
 	_world.release();
-	_baseLayer.release();
 	_player.release();
-
-	_tileMap.reset();
+	_hud.release();
+	_dialogBox.release();
+	_dialogText.release();
+	for(EntityRef& e: _inventorySlots)
+		e.release();
 }
 
 
@@ -279,17 +277,18 @@ void MainState::updateTick() {
 			offset(0) += 1;
 
 		float playerSpeed = _playerSpeed * float(TILE_SIZE) / float(TICKRATE);
-		if(!offset.isApprox(Vector2::Zero()))
+		if(!offset.isApprox(Vector2::Zero())) {
 			_player.translation2() += offset.normalized() * playerSpeed;
+		}
 
-		computeCollisions();
+		_level->computeCollisions();
 
 		CollisionComponent* pColl = _collisions.get(_player);
 		Vector2  bump(0, 0);
-		bump(0) += std::max(pColl->penetration(LEFT),  0.f);
-		bump(0) -= std::max(pColl->penetration(RIGHT), 0.f);
-		bump(1) += std::max(pColl->penetration(DOWN),  0.f);
-		bump(1) -= std::max(pColl->penetration(UP),    0.f);
+		bump(0) += std::max(0.01f + pColl->penetration(LEFT),  0.f);
+		bump(0) -= std::max(0.01f + pColl->penetration(RIGHT), 0.f);
+		bump(1) += std::max(0.01f + pColl->penetration(DOWN),  0.f);
+		bump(1) -= std::max(0.01f + pColl->penetration(UP),    0.f);
 		_player.translate(bump);
 
 		// WARNING: returning early might skip updateWorldTransform.
@@ -312,12 +311,6 @@ void MainState::updateTick() {
 				dbgLogger.debug("use: ", useEntity.name());
 			}
 		}
-
-		std::string levelName = _tileMap->properties().get("name", "__noname__").asString();
-		if(_levelLogicMap.count(levelName))
-			_levelLogicMap[levelName](*this, hitQueue, useEntity);
-		else
-			dbgLogger.warning("Level \"", levelName, "\" unknown.");
 	}
 	else {
 		if(_useInput->justPressed())
@@ -441,91 +434,6 @@ void MainState::removeFromInventory(Item item) {
 		}
 	}
 	lairAssert(false);
-}
-
-
-bool MainState::isSolid(TileMap::TileIndex tile) const {
-	unsigned x = (tile - 1) % TILE_SET_WIDTH;
-	return x >= TILE_SET_WIDTH / 2;
-}
-
-
-Vector2i MainState::cellCoord(const Vector2& pos, float height) const {
-	return Vector2i(pos(0) / TILE_SIZE, height - pos(1) / TILE_SIZE);
-}
-
-
-void updatePenetration(CollisionComponent* comp, const Box2& objBox, const Box2& otherBox) {
-	Vector2 offset = otherBox.center() - objBox.center();
-	Vector2 hsizes = (objBox.sizes() + otherBox.sizes()) / 2;
-
-	Box2 inter = objBox.intersection(otherBox);
-
-	bool hitX = objBox  .max()(0) > otherBox.min()(0)
-	         && otherBox.max()(0) > objBox  .min()(0);
-	bool hitY = objBox  .max()(1) > otherBox.min()(1)
-	         && otherBox.max()(1) > objBox  .min()(1);
-
-	if(hitY && (inter.isEmpty() || inter.sizes()(0) < inter.sizes()(1))) {
-		if(offset(0) < 0) {
-			float p = hsizes(0) + offset(0);
-			comp->setPenetration(LEFT,  std::max(comp->penetration(LEFT),  p));
-		}
-		else {
-			float p = hsizes(0) - offset(0);
-			comp->setPenetration(RIGHT, std::max(comp->penetration(RIGHT), p));
-		}
-	}
-	if(hitX && (inter.isEmpty() || inter.sizes()(1) < inter.sizes()(0))) {
-		if(offset(1) < 0) {
-			float p = hsizes(1) + offset(1);
-			comp->setPenetration(DOWN,  std::max(comp->penetration(DOWN),  p));
-		}
-		else {
-			float p = hsizes(1) - offset(1);
-			comp->setPenetration(UP,    std::max(comp->penetration(UP),    p));
-		}
-	}
-}
-
-
-void MainState::computeCollisions() {
-	// FIXME: The character can be stuck while sliding against a wall. Compute
-	// collision against thin walls.
-
-	CollisionComponent* cc = _collisions.get(_player);
-	if(!cc->isEnabled())
-		return;
-	lairAssert(cc && cc->shape() && cc->shape()->type() == SHAPE_ALIGNED_BOX);
-
-	TileLayerComponent* tlc = _tileLayers.get(_baseLayer);
-	lairAssert(tlc && tlc->tileMap());
-	unsigned layer = tlc->layerIndex();
-
-	for(int i = 0; i < N_DIRECTIONS; ++i)
-		cc->setPenetration(Direction(i), -TILE_SIZE);
-
-	Vector2 pos  = _player.transform().translation().head<2>();
-	Box2    realBox(pos + cc->shape()->point(0), pos + cc->shape()->point(1));
-	Vector2 size = realBox.sizes();
-	Box2i box(cellCoord(realBox.corner(Box2::TopLeft),     _tileMap->height(layer)),
-	          cellCoord(realBox.corner(Box2::BottomRight), _tileMap->height(layer)));
-
-	int width  = _tileMap->width(layer);
-	int height = _tileMap->height(layer);
-	int beginX = std::max(box.min()(0) - 1, 0);
-	int endX   = std::min(box.max()(0) + 2, width);
-	int beginY = std::max(box.min()(1) - 1, 0);
-	int endY   = std::min(box.max()(1) + 2, height);
-	for(int y = beginY; y < endY; ++y) {
-		for(int x = beginX; x < endX; ++x) {
-			if(isSolid(_tileMap->tile(x, y, layer))) {
-				Box2 tileBox(Vector2(x, height - y - 1) * TILE_SIZE,
-				             Vector2(x + 1, height - y) * TILE_SIZE);
-				updatePenetration(cc, realBox, tileBox);
-			}
-		}
-	}
 }
 
 

@@ -2,13 +2,13 @@
     "name": "player",
     "sprite": {
         "sprite":  "character.png",
-        "h_tiles": 2,
-        "v_tiles": 2,
+        "h_tiles": 3,
+        "v_tiles": 4,
         "index":   0,
-        "anchor":  [ 0.5, 0.5 ],
+        "anchor":  [ 0.5, 0.3333 ],
         "blend":   "alpha"
     },
     "collision": {
-        "abox": [ -16, -16, 16, 16 ]
+        "abox": [ -20, -20, 20, 20 ]
     }
 }

@@ -42,15 +42,30 @@
 #include <lair/ec/collision_component.h>
 
 
+#define ONE_SEC (1000000000)
+
+#define SCREEN_WIDTH  1920
+#define SCREEN_HEIGHT 1080
+
+#define FRAMERATE 60
+#define TICKRATE  60
+
+#define TILE_SIZE       48
+#define TILE_SET_WIDTH  12
+#define TILE_SET_HEIGHT 12
+
+#define HIT_PLAYER_FLAG  0x01
+#define HIT_TRIGGER_FLAG 0x02
+#define HIT_USE_FLAG     0x04
+
+
 using namespace lair;
 
 
 class Game;
 class MainState;
-
-
-typedef void (*LevelLogic)(MainState& state, HitEventQueue& hitQueue, EntityRef useEntity);
-typedef std::unordered_map<std::string, LevelLogic> LevelLogicMap;
+class Level;
+typedef std::shared_ptr<Level> LevelSP;
 
 
 enum Item {
@@ -59,6 +74,9 @@ enum Item {
 	ITEM_2,
 	ITEM_BG,
 };
+
+
+typedef std::unordered_map<Path, LevelSP, boost::hash<Path>> LevelMap;
 
 
 class MainState : public GameState {
@@ -74,7 +92,10 @@ public:
 
 	Game* game();
 
+	void registerLevel(const Path& path);
+
 	void startGame();
+	void startLevel(const Path& level);
 	void stopGame();
 
 	void updateTick();
@@ -89,10 +110,6 @@ public:
 	void addToInventory(Item item);
 	void removeFromInventory(Item item);
 
-	bool isSolid(TileMap::TileIndex tile) const;
-	Vector2i cellCoord(const Vector2& pos, float height) const;
-	void computeCollisions();
-
 	EntityRef createTrigger(EntityRef parent, const char* name, const Box2& box);
 
 	// Stuff
@@ -105,7 +122,7 @@ public:
 	RenderPass* renderPass() { return &_mainPass; }
 	SpriteRenderer* spriteRenderer() { return &_spriteRenderer; }
 
-protected:
+public:
 	// More or less system stuff
 
 	RenderPass                 _mainPass;
@@ -122,7 +139,6 @@ protected:
 
 	SlotTracker _slotTracker;
 
-	LevelLogicMap _levelLogicMap;
 	std::deque<std::string> _messageQueue;
 
 	OrthographicCamera _camera;
@@ -142,7 +158,8 @@ protected:
 	Input* _rightInput;
 	Input* _useInput;
 
-	TileMapSP _tileMap;
+	LevelMap  _levels;
+	LevelSP   _level;
 
 	// Models
 	EntityRef _models;
@@ -151,7 +168,6 @@ protected:
 
 	// Game entities
 	EntityRef _world;
-	EntityRef _baseLayer;
 	EntityRef _player;
 
 	// HUD entities
