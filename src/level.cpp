@@ -131,6 +131,9 @@ void Level::initialize() {
 			else if(type == "door") {
 				entity = createDoor(obj, name);
 			}
+			else if(type == "sprite") {
+				entity = createSprite(obj, name);
+			}
 			else if(type == "spawn") {
 				entity = _mainState->_entities.createEntity(_levelRoot, name.c_str());
 				entity.translation2() = objectBox(obj).center();
@@ -255,6 +258,32 @@ EntityRef Level::createDoor(const Json::Value& obj, const std::string& name) {
 
 	entity.place((Vector3() << box.center(), .2).finished());
 	setDoorOpen(_mainState, entity, open);
+
+	return entity;
+}
+
+
+EntityRef Level::createSprite(const Json::Value &obj, const std::string& name) {
+	Json::Value props = obj.get("properties", Json::Value());
+
+	Box2 box = objectBox(obj);
+	float depth = props.get("depth", 0.08).asFloat();
+	Vector2 offset(props.get("offset_x", 0.0).asFloat(),
+	               props.get("offset_y", 0.0).asFloat());
+
+	EntityRef entity = _mainState->_entities.createEntity(_levelRoot, name.c_str());
+	entity.place((Vector3() << box.center() + offset, depth).finished());
+
+	std::string sprite = props.get("sprite", "").asString();
+	SpriteComponent* sc = _mainState->_sprites.addComponent(entity);
+	sc->setTexture(sprite);
+	sc->setTileIndex(props.get("tile_index", 0).asInt());
+
+	int tileH = props.get("tile_h", 4).asInt();
+	int tileV = props.get("tile_v", 2).asInt();
+	sc->setTileGridSize(Vector2i(tileH, tileV));
+	sc->setAnchor(Vector2(.5, .5));
+	sc->setBlendingMode(BLEND_ALPHA);
 
 	return entity;
 }
