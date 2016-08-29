@@ -400,7 +400,15 @@ void MainState::updateTick() {
 		EntityRef useEntity;
 		if(_useInput->justPressed()) {
 			std::deque<EntityRef> useQueue;
-			_collisions.hitTest(useQueue, _player.worldTransform().translation().head<2>(), HIT_USE_FLAG);
+			Vector2 pos = _player.worldTransform().translation().head<2>();
+			_collisions.hitTest(useQueue, pos, HIT_USE_FLAG);
+
+			if(useQueue.empty()) {
+				float o = 28;
+				Vector2 offset((_playerDir == LEFT)? -o: (_playerDir == RIGHT)? o: 0,
+				               (_playerDir == DOWN)? -o: (_playerDir == UP   )? o: 0);
+				_collisions.hitTest(useQueue, pos + offset, HIT_USE_FLAG);
+			}
 
 			if(!useQueue.empty()) {
 				useEntity = useQueue.front();

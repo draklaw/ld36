@@ -82,6 +82,7 @@
    <properties>
     <property name="on_use">use_object item_0 switch door_0
 </property>
+    <property name="solid" type="bool" value="true"/>
    </properties>
   </object>
   <object id="8" name="exit" type="trigger" x="1488" y="0" width="240" height="48">

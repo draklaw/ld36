@@ -41,11 +41,13 @@
                  "name":"trigger_0",
                  "properties":
                     {
-                     "on_use":"use_object item_0 switch door_0\n"
+                     "on_use":"use_object item_0 switch door_0\n",
+                     "solid":true
                     },
                  "propertytypes":
                     {
-                     "on_use":"string"
+                     "on_use":"string",
+                     "solid":"bool"
                     },
                  "rotation":0,
                  "type":"trigger",

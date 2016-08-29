@@ -214,6 +214,10 @@ EntityRef Level::createTrigger(const Json::Value &obj, const std::string& name) 
 	tc->onEnter = props.get("on_enter", "").asString();
 	tc->onExit  = props.get("on_exit",  "").asString();
 	tc->onUse   = props.get("on_use",   "").asString();
+	if(props.get("solid", false).asBool()) {
+		CollisionComponent* cc = _mainState->_collisions.get(entity);
+		cc->setHitMask(cc->hitMask() | HIT_SOLID_FLAG);
+	}
 
 	std::string sprite = props.get("sprite", "").asString();
 	if(!sprite.empty()) {
