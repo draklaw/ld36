@@ -62,9 +62,10 @@ void Game::initialize() {
 	_mainState->initialize();
 	_mainState->startGame(_firstLevel);
 
-//	AssetSP music = _loader->loadAsset<MusicLoader>("shapeout.ogg");
-//	_loader->waitAll();
-//	audio()->playMusic(music);
+	AssetSP music = _loader->loadAsset<MusicLoader>("pyramid.ogg");
+	_loader->waitAll();
+	audio()->setMusicVolume(.075);
+	audio()->playMusic(music);
 }
 
 

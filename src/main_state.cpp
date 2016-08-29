@@ -753,7 +753,7 @@ void MainState::playSound(const Path& sound) {
 	AssetSP asset = assets()->getAsset(sound);
 
 	if(sound == "footstep.wav")
-		asset->aspect<SoundAspect>()->get()->setVolume(.25);
+		asset->aspect<SoundAspect>()->get()->setVolume(.15);
 
 	audio()->playSound(asset, 0, chann);
 }
