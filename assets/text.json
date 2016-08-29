@@ -39,9 +39,25 @@
 		"And... Please, don't freak out !"
 	],
 
-	"lvl_3_intro": [
-		"",
-		"",
-		""
+	"lvl_f_bocal_tout": [
+		"You : What a such Eerie creature ! If I use the gathered items, who knows what it will do...",
+		"You : The left control pannel seems to deactivate the stasis machine, and the right one seems to free the creature..."
+	],
+
+	"lvl_f_bocal_left": [
+		"You : I know I've done right."
+	],
+
+	"lvl_f_bocal_right": [
+		"??? : Hi, I'm Swth ! I can't thank you enought for freeing me, I was desesperate when I recorded these messages.",
+		"Swth : This ship is my vessel to come back home. If you want, you can come with me. Our people cohabited a long time with yours, and it would be the lesser I can do to thank you."
+	],
+
+	"lvl_f_board_tout": [
+		"I can try to make this ship works... Or simply take this teleporter and leave everything behing me... My friends must be worried."
+	],
+
+	"lvl_f_bocal_enable": [
+		"Let's discover a new wold !"
 	]
 }
