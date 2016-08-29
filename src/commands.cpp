@@ -257,3 +257,87 @@ int fadeOutCommand(MainState* state, EntityRef self, int argc, const char** argv
 
 	return 0;
 }
+
+
+int disableCommand(MainState* state, EntityRef self, int argc, const char** argv) {
+	if(argc != 1) {
+		dbgLogger.warning(argv[0], ": wrong number of argument.");
+		return -2;
+	}
+
+	if(!self.isValid()) {
+		dbgLogger.warning(argv[0], ": self is not set.");
+		return -2;
+	}
+
+	self.setEnabled(false);
+
+	return 0;
+}
+
+
+int bocalCommand(MainState* state, EntityRef self, int argc, const char** argv) {
+	if(argc != 1) {
+		dbgLogger.warning(argv[0], ": wrong number of argument.");
+		return -2;
+	}
+
+	if(state->_endingState == END_BOCAL_OFF) {
+		// enable consoles
+		// message
+		state->_endingState = END_BOCAL_ON;
+	}
+
+	return 0;
+}
+
+int bocalKillCommand(MainState* state, EntityRef self, int argc, const char** argv) {
+	if(argc != 1) {
+		dbgLogger.warning(argv[0], ": wrong number of argument.");
+		return -2;
+	}
+
+	if(state->_endingState == END_BOCAL_ON) {
+		// change bocal sprite
+		// message
+		state->_endingState = END_KILL;
+	}
+
+	return 0;
+}
+
+int bocalSaveCommand(MainState* state, EntityRef self, int argc, const char** argv) {
+	if(argc != 1) {
+		dbgLogger.warning(argv[0], ": wrong number of argument.");
+		return -2;
+	}
+
+	if(state->_endingState == END_BOCAL_ON) {
+		// change bocal sprite
+		// spawn alien
+		// message
+		state->_endingState = END_SAVE;
+	}
+
+	return 0;
+}
+
+int letsFlyCommand(MainState* state, EntityRef self, int argc, const char** argv) {
+	if(argc != 1) {
+		dbgLogger.warning(argv[0], ": wrong number of argument.");
+		return -2;
+	}
+
+
+	return 0;
+}
+
+int letsQuitCommand(MainState* state, EntityRef self, int argc, const char** argv) {
+	if(argc != 1) {
+		dbgLogger.warning(argv[0], ": wrong number of argument.");
+		return -2;
+	}
+
+
+	return 0;
+}

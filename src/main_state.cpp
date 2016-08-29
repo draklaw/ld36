@@ -100,6 +100,12 @@ MainState::MainState(Game* game)
 	_commands["continue"]    = continueCommand;
 	_commands["fade_in"]     = fadeInCommand;
 	_commands["fade_out"]    = fadeOutCommand;
+	_commands["disable"]     = disableCommand;
+	_commands["bocal"]       = bocalCommand;
+	_commands["bocal_kill"]  = bocalKillCommand;
+	_commands["bocal_save"]  = bocalSaveCommand;
+	_commands["lets_fly"]    = letsFlyCommand;
+	_commands["lets_quit"]   = letsQuitCommand;
 }
 
 
@@ -155,6 +161,7 @@ void MainState::initialize() {
 	loader()->load<TileMapLoader>("lvl_0.json");
 
 	loader()->load<ImageLoader>("dialog_box.png");
+	loader()->load<ImageLoader>("bocal.png");
 
 	preloadSound("button.wav");
 	preloadSound("door.wav");
@@ -288,6 +295,8 @@ void MainState::startGame(const Path& firstLevel) {
 	_postCommand.clear();
 	_inventorySlots.clear();
 
+	_endingState = END_BOCAL_OFF;
+
 	_world = _entities.createEntity(_entities.root(), "world");
 
 	_player = _entities.cloneEntity(_playerModel, _world);
@@ -325,6 +334,8 @@ void MainState::startGame(const Path& firstLevel) {
 	sc->setBlendingMode(BLEND_ALPHA);
 
 	startLevel(firstLevel);
+
+	loader()->waitAll();
 
 	dbgLogger.info("Entity count: ", _entities.nEntities(), " (", _entities.nZombieEntities(), " zombies)");
 }
@@ -474,8 +485,7 @@ void MainState::updateTick() {
 		if(_fadeAnim >= 1)
 			setState(STATE_PLAY);
 	}
-
-	if(!_messageQueue.empty()) {
+	else if(!_messageQueue.empty()) {
 		if(_useInput->justPressed()) {
 			playSound("menu.wav");
 			nextMessage();

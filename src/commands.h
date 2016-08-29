@@ -61,5 +61,12 @@ int continueCommand(MainState* state, EntityRef self, int argc, const char** arg
 int fadeInCommand(MainState* state, EntityRef self, int argc, const char** argv);
 int fadeOutCommand(MainState* state, EntityRef self, int argc, const char** argv);
 
+int disableCommand(MainState* state, EntityRef self, int argc, const char** argv);
+
+int bocalCommand(MainState* state, EntityRef self, int argc, const char** argv);
+int bocalKillCommand(MainState* state, EntityRef self, int argc, const char** argv);
+int bocalSaveCommand(MainState* state, EntityRef self, int argc, const char** argv);
+int letsFlyCommand(MainState* state, EntityRef self, int argc, const char** argv);
+int letsQuitCommand(MainState* state, EntityRef self, int argc, const char** argv);
 
 #endif

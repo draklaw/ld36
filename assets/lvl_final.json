@@ -13,7 +13,7 @@
         }, 
         {
          "draworder":"topdown",
-         "height":48,
+         "height":0,
          "name":"Calque d'objets 1",
          "objects":[
                 {
@@ -34,7 +34,7 @@
                  "properties":
                     {
                      "margin":-8,
-                     "on_enter":"next_level lvl_6.json\n"
+                     "on_enter":"fade_out next_level lvl_6.json spawn2\n\n"
                     },
                  "propertytypes":
                     {
@@ -52,6 +52,16 @@
                  "height":48,
                  "id":5,
                  "name":"credits",
+                 "properties":
+                    {
+                     "margin":16,
+                     "on_enter":"lets_quit"
+                    },
+                 "propertytypes":
+                    {
+                     "margin":"float",
+                     "on_enter":"string"
+                    },
                  "rotation":0,
                  "type":"trigger",
                  "visible":true,
@@ -65,8 +75,9 @@
                  "name":"bocal",
                  "properties":
                     {
-                     "on_use":"message lvl_f_bocal_tout",
-                     "sprite":"Bocal.png",
+                     "on_use":"bocal",
+                     "solid":true,
+                     "sprite":"bocal.png",
                      "tile_h":3,
                      "tile_index":0,
                      "tile_v":1
@@ -74,6 +85,7 @@
                  "propertytypes":
                     {
                      "on_use":"string",
+                     "solid":"bool",
                      "sprite":"string",
                      "tile_h":"int",
                      "tile_index":"int",
@@ -92,11 +104,13 @@
                  "name":"left",
                  "properties":
                     {
-                     "on_use":"message lvl_f_bocal_left\n"
+                     "on_use":"bocal_kill\n",
+                     "solid":true
                     },
                  "propertytypes":
                     {
-                     "on_use":"string"
+                     "on_use":"string",
+                     "solid":"bool"
                     },
                  "rotation":0,
                  "type":"trigger",
@@ -112,7 +126,7 @@
                  "properties":
                     {
                      "margin":-8,
-                     "on_enter":"message lvl_f_board_tout"
+                     "on_enter":"message lvl_f_board_tout\ndisable"
                     },
                  "propertytypes":
                     {
@@ -130,6 +144,16 @@
                  "height":48,
                  "id":10,
                  "name":"letsfly",
+                 "properties":
+                    {
+                     "on_use":"lets_fly",
+                     "solid":true
+                    },
+                 "propertytypes":
+                    {
+                     "on_use":"string",
+                     "solid":"bool"
+                    },
                  "rotation":0,
                  "type":"trigger",
                  "visible":true,
@@ -143,11 +167,13 @@
                  "name":"right",
                  "properties":
                     {
-                     "on_use":"message lvl_f_bocal_right\n"
+                     "on_use":"bocal_save",
+                     "solid":true
                     },
                  "propertytypes":
                     {
-                     "on_use":"string"
+                     "on_use":"string",
+                     "solid":"bool"
                     },
                  "rotation":0,
                  "type":"trigger",
@@ -155,15 +181,53 @@
                  "width":144,
                  "x":864,
                  "y":1824
+                }, 
+                {
+                 "height":48,
+                 "id":12,
+                 "name":"block",
+                 "properties":
+                    {
+                     "solid":true
+                    },
+                 "propertytypes":
+                    {
+                     "solid":"bool"
+                    },
+                 "rotation":0,
+                 "type":"trigger",
+                 "visible":true,
+                 "width":48,
+                 "x":672,
+                 "y":1536
+                }, 
+                {
+                 "height":48,
+                 "id":13,
+                 "name":"block",
+                 "properties":
+                    {
+                     "solid":true
+                    },
+                 "propertytypes":
+                    {
+                     "solid":"bool"
+                    },
+                 "rotation":0,
+                 "type":"trigger",
+                 "visible":true,
+                 "width":48,
+                 "x":768,
+                 "y":1536
                 }],
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
-         "width":31,
+         "width":0,
          "x":0,
          "y":0
         }],
- "nextobjectid":12,
+ "nextobjectid":15,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tileheight":48,

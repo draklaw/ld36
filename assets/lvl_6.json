@@ -22,10 +22,12 @@
                  "name":"spawn",
                  "properties":
                     {
+                     "margin":-16,
                      "on_enter":"fade_out next_level lvl_1.json spawn2\n"
                     },
                  "propertytypes":
                     {
+                     "margin":"float",
                      "on_enter":"string"
                     },
                  "rotation":0,
@@ -41,10 +43,12 @@
                  "name":"spawn2",
                  "properties":
                     {
+                     "margin":-16,
                      "on_enter":"fade_out next_level lvl_final.json\n"
                     },
                  "propertytypes":
                     {
+                     "margin":"float",
                      "on_enter":"string"
                     },
                  "rotation":0,

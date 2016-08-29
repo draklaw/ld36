@@ -87,6 +87,13 @@ enum State {
 	STATE_FADE_OUT,
 };
 
+enum EndingState {
+	END_BOCAL_OFF,
+	END_BOCAL_ON,
+	END_SAVE,
+	END_KILL,
+};
+
 
 typedef std::unordered_map<Path, LevelSP, boost::hash<Path>> LevelMap;
 
@@ -182,6 +189,8 @@ public:
 	std::deque<std::string> _messageQueue;
 	OrthographicCamera _camera;
 	SoundMap _soundMap;
+
+	EndingState _endingState;
 
 	bool       _initialized;
 	bool       _running;
