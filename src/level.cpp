@@ -189,7 +189,7 @@ EntityRef Level::createLayer(unsigned index, const char* name) {
 	TileLayerComponent* lc = _mainState->_tileLayers.addComponent(layer);
 	lc->setTileMap(_tileMap);
 	lc->setLayerIndex(index);
-	lc->setTextureFlags(Texture::BILINEAR | Texture::REPEAT);
+	lc->setTextureFlags(Texture::BILINEAR_NO_MIPMAP | Texture::REPEAT);
 	layer.place(Vector3(0, 0, .01 * index));
 	return layer;
 }
