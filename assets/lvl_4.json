@@ -19,7 +19,7 @@
                 {
                  "height":48,
                  "id":1,
-                 "name":"Spawn",
+                 "name":"spawn",
                  "rotation":0,
                  "type":"spawn",
                  "visible":true,
@@ -68,7 +68,7 @@
                 {
                  "height":96,
                  "id":4,
-                 "name":"door_green",
+                 "name":"door_blue",
                  "properties":
                     {
                      "horizontal":true
@@ -121,7 +121,7 @@
                  "properties":
                     {
                      "margin":-8,
-                     "on_enter":"switch door_green\n",
+                     "on_enter":"switch door_blue\n",
                      "sprite":"buttons.png",
                      "tile_index":2
                     },
@@ -205,6 +205,31 @@
                  "width":48,
                  "x":1104,
                  "y":480
+                }, 
+                {
+                 "height":48,
+                 "id":14,
+                 "name":"radio",
+                 "properties":
+                    {
+                     "on_use":"message lvl_4_intro",
+                     "sprite":"items.png",
+                     "tile_index":7,
+                     "tile_v":4
+                    },
+                 "propertytypes":
+                    {
+                     "on_use":"string",
+                     "sprite":"string",
+                     "tile_index":"int",
+                     "tile_v":"int"
+                    },
+                 "rotation":0,
+                 "type":"trigger",
+                 "visible":true,
+                 "width":48,
+                 "x":1392,
+                 "y":672
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -213,7 +238,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":14,
+ "nextobjectid":15,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tileheight":48,

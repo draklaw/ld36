@@ -522,6 +522,31 @@
                  "width":144,
                  "x":864,
                  "y":1824
+                }, 
+                {
+                 "height":48,
+                 "id":38,
+                 "name":"radio",
+                 "properties":
+                    {
+                     "on_use":"message lvl_0_intro",
+                     "sprite":"items.png",
+                     "tile_index":7,
+                     "tile_v":4
+                    },
+                 "propertytypes":
+                    {
+                     "on_use":"string",
+                     "sprite":"string",
+                     "tile_index":"int",
+                     "tile_v":"int"
+                    },
+                 "rotation":0,
+                 "type":"trigger",
+                 "visible":true,
+                 "width":48,
+                 "x":1008,
+                 "y":1632
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -530,7 +555,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":38,
+ "nextobjectid":40,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tileheight":48,
