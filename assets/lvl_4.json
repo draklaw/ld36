@@ -33,7 +33,7 @@
                  "name":"exit_prev",
                  "properties":
                     {
-                     "on_enter":"next_level lvl_init.json\n"
+                     "on_enter":"fade_out next_level lvl_init.json spawn2\n"
                     },
                  "propertytypes":
                     {
@@ -52,7 +52,7 @@
                  "name":"exit",
                  "properties":
                     {
-                     "on_enter":"next_level lvl_5.json\n"
+                     "on_enter":"fade_out next_level lvl_5.json\n"
                     },
                  "propertytypes":
                     {
@@ -107,6 +107,14 @@
                  "height":48,
                  "id":7,
                  "name":"item_0",
+                 "properties":
+                    {
+                     "item":2
+                    },
+                 "propertytypes":
+                    {
+                     "item":"int"
+                    },
                  "rotation":0,
                  "type":"item",
                  "visible":true,
@@ -121,7 +129,7 @@
                  "properties":
                     {
                      "margin":-8,
-                     "on_enter":"switch door_blue\n",
+                     "on_enter":"play_sound button.wav\nswitch door_blue\n",
                      "sprite":"buttons.png",
                      "tile_index":2
                     },
@@ -146,7 +154,7 @@
                  "properties":
                     {
                      "margin":-8,
-                     "on_enter":"switch door_red",
+                     "on_enter":"play_sound button.wav\nswitch door_red",
                      "sprite":"buttons.png",
                      "tile_index":3
                     },
@@ -170,7 +178,7 @@
                  "name":"tp_1",
                  "properties":
                     {
-                     "margin":-8,
+                     "margin":-16,
                      "on_enter":"teleport tp_0\n"
                     },
                  "propertytypes":
@@ -191,7 +199,7 @@
                  "name":"tp_0",
                  "properties":
                     {
-                     "margin":-8,
+                     "margin":-16,
                      "on_enter":"teleport tp_1\n"
                     },
                  "propertytypes":
@@ -212,7 +220,7 @@
                  "name":"radio",
                  "properties":
                     {
-                     "on_use":"message lvl_4_intro",
+                     "on_use":"play_sound radio.wav\nmessage lvl_4_intro",
                      "sprite":"items.png",
                      "tile_index":7,
                      "tile_v":4
@@ -230,6 +238,17 @@
                  "width":48,
                  "x":1392,
                  "y":672
+                }, 
+                {
+                 "height":48,
+                 "id":15,
+                 "name":"spawn2",
+                 "rotation":0,
+                 "type":"spawn",
+                 "visible":true,
+                 "width":48,
+                 "x":48,
+                 "y":240
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -238,7 +257,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":15,
+ "nextobjectid":16,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tileheight":48,

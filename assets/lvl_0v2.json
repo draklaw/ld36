@@ -23,7 +23,7 @@
                  "properties":
                     {
                      "margin":-8,
-                     "on_enter":"switch door_yellow\nswitch door_green\n",
+                     "on_enter":"play_sound button.wav\nswitch door_yellow\nswitch door_green\n",
                      "sprite":"buttons.png",
                      "tile_index":1
                     },
@@ -48,7 +48,7 @@
                  "properties":
                     {
                      "margin":-8,
-                     "on_enter":"switch door_yellow\nswitch door_green\n",
+                     "on_enter":"play_sound button.wav\nswitch door_yellow\nswitch door_green\n",
                      "sprite":"buttons.png",
                      "tile_index":1
                     },
@@ -73,7 +73,7 @@
                  "properties":
                     {
                      "margin":-8,
-                     "on_enter":"switch door_green\nswitch door_blue\n",
+                     "on_enter":"play_sound button.wav\nswitch door_green\nswitch door_blue\n",
                      "sprite":"buttons.png"
                     },
                  "propertytypes":
@@ -96,7 +96,7 @@
                  "properties":
                     {
                      "margin":-8,
-                     "on_enter":"switch door_green\nswitch door_blue\n",
+                     "on_enter":"play_sound button.wav\nswitch door_green\nswitch door_blue\n",
                      "sprite":"buttons.png"
                     },
                  "propertytypes":
@@ -119,7 +119,7 @@
                  "properties":
                     {
                      "margin":-8,
-                     "on_enter":"switch door_yellow\nswitch door_blue\n",
+                     "on_enter":"play_sound button.wav\nswitch door_yellow\nswitch door_blue\n",
                      "sprite":"buttons.png",
                      "tile_index":2
                     },
@@ -144,7 +144,7 @@
                  "properties":
                     {
                      "margin":-8,
-                     "on_enter":"switch door_red\n",
+                     "on_enter":"play_sound button.wav\nswitch door_red\n",
                      "sprite":"buttons.png",
                      "tile_index":3
                     },
@@ -169,7 +169,7 @@
                  "properties":
                     {
                      "margin":-8,
-                     "on_enter":"switch door_yellow\nswitch door_blue\n",
+                     "on_enter":"play_sound button.wav\nswitch door_yellow\nswitch door_blue\n",
                      "sprite":"buttons.png",
                      "tile_index":2
                     },
@@ -461,7 +461,7 @@
                  "name":"exit",
                  "properties":
                     {
-                     "on_enter":"next_level lvl_1.json\n"
+                     "on_enter":"fade_out next_level lvl_3.json\n"
                     },
                  "propertytypes":
                     {
@@ -478,6 +478,14 @@
                  "height":48,
                  "id":28,
                  "name":"item_0",
+                 "properties":
+                    {
+                     "item":3
+                    },
+                 "propertytypes":
+                    {
+                     "item":"int"
+                    },
                  "rotation":0,
                  "type":"item",
                  "visible":true,
@@ -491,7 +499,7 @@
                  "name":"item_1",
                  "properties":
                     {
-                     "item":1
+                     "item":8
                     },
                  "propertytypes":
                     {
@@ -510,7 +518,7 @@
                  "name":"exit_prev",
                  "properties":
                     {
-                     "on_enter":"next_level lvl_5.json\n"
+                     "on_enter":"fade_out next_level lvl_5.json spawn2\n"
                     },
                  "propertytypes":
                     {
@@ -529,7 +537,7 @@
                  "name":"radio",
                  "properties":
                     {
-                     "on_use":"message lvl_0_intro",
+                     "on_use":"play_sound radio.wav\nmessage lvl_0_intro",
                      "sprite":"items.png",
                      "tile_index":7,
                      "tile_v":4
@@ -878,6 +886,17 @@
                  "width":48,
                  "x":1440,
                  "y":1152
+                }, 
+                {
+                 "height":48,
+                 "id":53,
+                 "name":"spawn2",
+                 "rotation":0,
+                 "type":"spawn",
+                 "visible":true,
+                 "width":48,
+                 "x":912,
+                 "y":48
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -886,7 +905,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":53,
+ "nextobjectid":54,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tileheight":48,

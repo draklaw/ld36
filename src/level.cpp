@@ -137,9 +137,10 @@ void Level::initialize() {
 			else if(type == "spawn") {
 				entity = _mainState->_entities.createEntity(_levelRoot, name.c_str());
 				entity.translation2() = objectBox(obj).center();
+				entity.extra() = obj["properties"];
 			}
 
-			if(!entity.isValid() && type != "spawn")
+			if(!entity.isValid())
 				dbgLogger.warning(_path, ": Failed to load entity \"", name, "\" of type \"", type, "\"");
 			else
 				_entityMap.emplace(name, entity);
@@ -159,6 +160,11 @@ void Level::start(const std::string& spawn) {
 	HitEventQueue hitQueue;
 	_mainState->_collisions.findCollisions(hitQueue);
 	_mainState->updateTriggers(hitQueue, EntityRef(), true);
+
+	_mainState->orientPlayer(_mainState->_playerDir);
+
+	_mainState->setOverlay(1);
+	_mainState->exec(spawnEntity.extra().get("on_enter", "fade_in").asString());
 }
 
 

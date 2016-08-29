@@ -34,7 +34,7 @@ Game::Game(int argc, char** argv)
     : GameBase(argc, argv),
       _mainState(),
       _splashState(),
-      _firstLevel("lvl_0.json") {
+      _firstLevel("lvl_init.json") {
 
 	if(argc == 2) {
 		_firstLevel = argv[1];

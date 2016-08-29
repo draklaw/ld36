@@ -31,6 +31,8 @@
 #include <lair/utils/input.h>
 #include <lair/utils/tile_map.h>
 
+#include <lair/sys_sdl2/audio_module.h>
+
 #include <lair/render_gl2/orthographic_camera.h>
 #include <lair/render_gl2/render_pass.h>
 
@@ -78,11 +80,20 @@ enum Item {
 	ITEM_BG,
 };
 
+enum State {
+	STATE_PLAY,
+	STATE_MESSAGE,
+	STATE_FADE_IN,
+	STATE_FADE_OUT,
+};
+
 
 typedef std::unordered_map<Path, LevelSP, boost::hash<Path>> LevelMap;
 
 typedef int (*Command)(MainState* state, EntityRef self, int argc, const char** argv);
 typedef std::unordered_map<std::string, Command> CommandMap;
+
+typedef std::unordered_map<Path, int, boost::hash<Path>> SoundMap;
 
 
 class MainState : public GameState {
@@ -113,12 +124,24 @@ public:
 
 	// Game functions
 
+	void setState(State state);
+
+	void setPostCommand(const std::string& command);
+	void setPostCommand(int argc, const char** argv);
+
 	void enqueueMessage(const std::string& message);
 	void nextMessage();
 
 	bool hasItem(Item item);
 	void addToInventory(Item item);
 	void removeFromInventory(Item item);
+
+	void setOverlay(float opacity, const Vector4& color = Vector4(0, 0, 0, 1));
+
+	void preloadSound(const Path& sound);
+	void playSound(const Path& sound);
+
+	void orientPlayer(Direction dir, int frame = 0);
 
 	EntityRef createTrigger(EntityRef parent, const char* name, const Box2& box);
 
@@ -152,10 +175,13 @@ public:
 
 	SlotTracker _slotTracker;
 
+	State       _state;
 	CommandMap  _commands;
 	Json::Value _messages;
+	std::string _postCommand;
 	std::deque<std::string> _messageQueue;
 	OrthographicCamera _camera;
+	SoundMap _soundMap;
 
 	bool       _initialized;
 	bool       _running;
@@ -163,6 +189,7 @@ public:
 	int64      _fpsTime;
 	unsigned   _fpsCount;
 	uint64     _prevFrameTime;
+	float      _fadeAnim;
 
 	Input* _quitInput;
 	Input* _restartInput;
@@ -194,10 +221,12 @@ public:
 	EntityRef _dialogBox;
 	EntityRef _dialogText;
 	std::vector<EntityRef> _inventorySlots;
+	EntityRef _overlay;
 
 	// Game params
 	float _playerSpeed;
 	float _playerAnimSpeed;
+	float _fadeTime;
 };
 
 

@@ -33,7 +33,7 @@
                  "name":"exit_prev",
                  "properties":
                     {
-                     "on_enter":"next_level lvl_1.json\n"
+                     "on_enter":"fade_out next_level lvl_0v2.json spawn2\n"
                     },
                  "propertytypes":
                     {
@@ -52,10 +52,12 @@
                  "name":"exit",
                  "properties":
                     {
-                     "on_exit":"next_level lvl_1.json\n"
+                     "on_enter":"fade_out next_level lvl_1.json\n",
+                     "on_exit":""
                     },
                  "propertytypes":
                     {
+                     "on_enter":"string",
                      "on_exit":"string"
                     },
                  "rotation":0,
@@ -69,6 +71,14 @@
                  "height":48,
                  "id":9,
                  "name":"item_1",
+                 "properties":
+                    {
+                     "item":6
+                    },
+                 "propertytypes":
+                    {
+                     "item":"int"
+                    },
                  "rotation":0,
                  "type":"item",
                  "visible":true,
@@ -82,7 +92,7 @@
                  "name":"tp_0",
                  "properties":
                     {
-                     "margin":-8,
+                     "margin":-16,
                      "on_enter":"teleport tp_1"
                     },
                  "propertytypes":
@@ -103,7 +113,7 @@
                  "name":"tp_1",
                  "properties":
                     {
-                     "margin":-8,
+                     "margin":-16,
                      "on_enter":"teleport tp_0"
                     },
                  "propertytypes":
@@ -124,7 +134,7 @@
                  "name":"tp_3",
                  "properties":
                     {
-                     "margin":-8,
+                     "margin":-16,
                      "on_enter":"teleport tp_2",
                      "on_exit":""
                     },
@@ -147,7 +157,7 @@
                  "name":"tp_2",
                  "properties":
                     {
-                     "margin":-8,
+                     "margin":-16,
                      "on_enter":"teleport tp_3"
                     },
                  "propertytypes":
@@ -168,7 +178,7 @@
                  "name":"tp_4",
                  "properties":
                     {
-                     "margin":-8,
+                     "margin":-16,
                      "on_enter":"teleport tp_5"
                     },
                  "propertytypes":
@@ -189,7 +199,7 @@
                  "name":"tp_5",
                  "properties":
                     {
-                     "margin":-8,
+                     "margin":-16,
                      "on_enter":"teleport tp_4"
                     },
                  "propertytypes":
@@ -210,7 +220,7 @@
                  "name":"tp_6",
                  "properties":
                     {
-                     "margin":-8,
+                     "margin":-16,
                      "on_enter":"teleport tp_7"
                     },
                  "propertytypes":
@@ -231,7 +241,7 @@
                  "name":"tp_7",
                  "properties":
                     {
-                     "margin":-8,
+                     "margin":-16,
                      "on_enter":"teleport tp_6"
                     },
                  "propertytypes":
@@ -252,7 +262,7 @@
                  "name":"tp_8",
                  "properties":
                     {
-                     "margin":-8,
+                     "margin":-16,
                      "on_enter":"teleport tp_9"
                     },
                  "propertytypes":
@@ -273,7 +283,7 @@
                  "name":"tp_9",
                  "properties":
                     {
-                     "margin":-8,
+                     "margin":-16,
                      "on_enter":"teleport tp_8"
                     },
                  "propertytypes":
@@ -294,7 +304,7 @@
                  "name":"tp_10",
                  "properties":
                     {
-                     "margin":-8,
+                     "margin":-16,
                      "on_enter":"teleport tp_11"
                     },
                  "propertytypes":
@@ -315,10 +325,12 @@
                  "name":"tp_11",
                  "properties":
                     {
+                     "margin":-16,
                      "on_enter":"teleport tp_10"
                     },
                  "propertytypes":
                     {
+                     "margin":"float",
                      "on_enter":"string"
                     },
                  "rotation":0,
@@ -334,7 +346,7 @@
                  "name":"tp_12",
                  "properties":
                     {
-                     "margin":-8,
+                     "margin":-16,
                      "on_enter":"teleport tp_13"
                     },
                  "propertytypes":
@@ -355,7 +367,7 @@
                  "name":"tp_13",
                  "properties":
                     {
-                     "margin":-8,
+                     "margin":-16,
                      "on_enter":"teleport tp_12"
                     },
                  "propertytypes":
@@ -376,7 +388,7 @@
                  "name":"tp_14",
                  "properties":
                     {
-                     "margin":-8,
+                     "margin":-16,
                      "on_enter":"teleport tp_15"
                     },
                  "propertytypes":
@@ -397,7 +409,7 @@
                  "name":"tp_15",
                  "properties":
                     {
-                     "margin":-8,
+                     "margin":-16,
                      "on_enter":"teleport tp_14"
                     },
                  "propertytypes":
@@ -418,7 +430,7 @@
                  "name":"tp_16",
                  "properties":
                     {
-                     "margin":-8,
+                     "margin":-16,
                      "on_enter":"teleport tp_17"
                     },
                  "propertytypes":
@@ -439,7 +451,7 @@
                  "name":"tp_17",
                  "properties":
                     {
-                     "margin":-8,
+                     "margin":-16,
                      "on_enter":"teleport tp_16"
                     },
                  "propertytypes":
@@ -453,6 +465,17 @@
                  "width":48,
                  "x":864,
                  "y":528
+                }, 
+                {
+                 "height":48,
+                 "id":40,
+                 "name":"spawn2",
+                 "rotation":0,
+                 "type":"spawn",
+                 "visible":true,
+                 "width":48,
+                 "x":48,
+                 "y":816
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -461,7 +484,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":40,
+ "nextobjectid":41,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tileheight":48,
