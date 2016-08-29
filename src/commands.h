@@ -42,6 +42,7 @@ int echoCommand(MainState* state, EntityRef self, int argc, const char** argv);
 bool isDoorOpen(MainState* state, EntityRef door);
 void setDoorOpen(MainState* state, EntityRef door, bool open);
 int switchDoorCommand(MainState* state, EntityRef self, int argc, const char** argv);
+int setDoorCommand(MainState* state, EntityRef self, int argc, const char** argv);
 
 int pickupItemCommand(MainState* state, EntityRef self, int argc, const char** argv);
 
@@ -52,6 +53,13 @@ int nextLevelCommand(MainState* state, EntityRef self, int argc, const char** ar
 int teleportCommand(MainState* state, EntityRef self, int argc, const char** argv);
 
 int useObjectCommand(MainState* state, EntityRef self, int argc, const char** argv);
+
+int playSoundCommand(MainState* state, EntityRef self, int argc, const char** argv);
+
+int continueCommand(MainState* state, EntityRef self, int argc, const char** argv);
+
+int fadeInCommand(MainState* state, EntityRef self, int argc, const char** argv);
+int fadeOutCommand(MainState* state, EntityRef self, int argc, const char** argv);
 
 
 #endif

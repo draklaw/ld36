@@ -21,6 +21,8 @@
 
 #include <sstream>
 
+#include <lair/sys_sdl2/audio_module.h>
+
 #include "main_state.h"
 #include "level.h"
 
@@ -64,9 +66,29 @@ int switchDoorCommand(MainState* state, EntityRef self, int argc, const char** a
 		return -2;
 	}
 
+	state->playSound("door.wav");
+
 	auto targets = state->_level->entities(argv[1]);
 	for(EntityRef entity: targets) {
 		setDoorOpen(state, entity, !isDoorOpen(state, entity));
+	}
+
+	return 0;
+}
+
+
+int setDoorCommand(MainState* state, EntityRef self, int argc, const char** argv) {
+	if(argc != 3) {
+		dbgLogger.warning("Command ", argv[0], ": Invalid number of arguments.");
+		return -2;
+	}
+
+	state->playSound("door.wav");
+
+	auto targets = state->_level->entities(argv[1]);
+	bool open = std::atoi(argv[2]);
+	for(EntityRef entity: targets) {
+		setDoorOpen(state, entity, open);
 	}
 
 	return 0;
@@ -89,6 +111,7 @@ int pickupItemCommand(MainState* state, EntityRef self, int argc, const char** a
 		return -2;
 	}
 
+	state->playSound("footstep.wav");
 	int item = sc->tileIndex();
 	state->addToInventory(Item(item));
 
@@ -99,7 +122,7 @@ int pickupItemCommand(MainState* state, EntityRef self, int argc, const char** a
 
 
 int messageCommand(MainState* state, EntityRef self, int argc, const char** argv) {
-	if(argc != 2) {
+	if(argc < 2) {
 		dbgLogger.warning("messageCommand: wrong number of argument.");
 		return -2;
 	}
@@ -112,6 +135,11 @@ int messageCommand(MainState* state, EntityRef self, int argc, const char** argv
 
 	for(const Json::Value& msg: messages)
 		state->enqueueMessage(msg.asString());
+
+	if(argc > 2)
+		state->setPostCommand(argc - 2, argv + 2);
+	else
+		state->setPostCommand("continue");
 
 	return 0;
 }
@@ -146,6 +174,7 @@ int teleportCommand(MainState* state, EntityRef self, int argc, const char** arg
 
 	float depth = state->_player.transform()(2, 3);
 	state->_player.place((Vector3() << target.translation2(), depth).finished());
+	state->playSound("tp.wav");
 
 	TriggerComponent* tc = state->_triggers.get(target);
 	if(tc) {
@@ -165,8 +194,65 @@ int useObjectCommand(MainState* state, EntityRef self, int argc, const char** ar
 
 	Item item = Item(std::atoi(argv[1]));
 	if(state->hasItem(item)) {
+		state->playSound("footstep.wav");
 		state->removeFromInventory(item);
 		state->exec(argc - 2, argv + 2, self);
+	}
+
+	return 0;
+}
+
+
+int playSoundCommand(MainState* state, EntityRef self, int argc, const char** argv) {
+	if(argc != 2) {
+		dbgLogger.warning("playSoundCommand: wrong number of argument.");
+		return -2;
+	}
+
+	state->playSound(argv[1]);
+
+	return 0;
+}
+
+
+int continueCommand(MainState* state, EntityRef self, int argc, const char** argv) {
+	if(argc != 1) {
+		dbgLogger.warning("playSoundCommand: wrong number of argument.");
+		return -2;
+	}
+
+	state->setState(STATE_PLAY);
+
+	return 0;
+}
+
+
+int fadeInCommand(MainState* state, EntityRef self, int argc, const char** argv) {
+	if(argc < 1) {
+		dbgLogger.warning("fadeInCommand: wrong number of argument.");
+		return -2;
+	}
+
+	state->setState(STATE_FADE_IN);
+
+	if(argc > 2) {
+		state->setPostCommand(argc - 1, argv + 1);
+	}
+
+	return 0;
+}
+
+
+int fadeOutCommand(MainState* state, EntityRef self, int argc, const char** argv) {
+	if(argc < 1) {
+		dbgLogger.warning("fadeOutCommand: wrong number of argument.");
+		return -2;
+	}
+
+	state->setState(STATE_FADE_OUT);
+
+	if(argc > 2) {
+		state->setPostCommand(argc - 1, argv + 1);
 	}
 
 	return 0;

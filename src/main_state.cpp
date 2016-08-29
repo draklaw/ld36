@@ -77,8 +77,9 @@ MainState::MainState(Game* game)
       _rightInput   (nullptr),
       _useInput     (nullptr),
 
-      _playerSpeed(5),
-      _playerAnimSpeed(5)
+      _playerSpeed(8),
+      _playerAnimSpeed(5),
+      _fadeTime(.5)
 {
 	// Register the component manager by decreasing importance. The first ones
 	// will be more easily accessible.
@@ -89,11 +90,16 @@ MainState::MainState(Game* game)
 	_entities.registerComponentManager(&_tileLayers);
 
 	_commands["switch"]      = switchDoorCommand;
+	_commands["set_door"]    = setDoorCommand;
 	_commands["pickup_item"] = pickupItemCommand;
 	_commands["message"]     = messageCommand;
 	_commands["next_level"]  = nextLevelCommand;
 	_commands["teleport"]    = teleportCommand;
 	_commands["use_object"]  = useObjectCommand;
+	_commands["play_sound"]  = playSoundCommand;
+	_commands["continue"]    = continueCommand;
+	_commands["fade_in"]     = fadeInCommand;
+	_commands["fade_out"]    = fadeOutCommand;
 }
 
 
@@ -149,6 +155,13 @@ void MainState::initialize() {
 	loader()->load<TileMapLoader>("lvl_0.json");
 
 	loader()->load<ImageLoader>("dialog_box.png");
+
+	preloadSound("button.wav");
+	preloadSound("door.wav");
+	preloadSound("footstep.wav");
+	preloadSound("menu.wav");
+	preloadSound("radio.wav");
+	preloadSound("tp.wav");
 
 	_playerModel = loadEntity("player.json", _models);
 	_collisions.get(_playerModel)->setHitMask(HIT_PLAYER_FLAG | HIT_SOLID_FLAG);
@@ -272,6 +285,7 @@ void MainState::startGame(const Path& firstLevel) {
 	}
 
 	_messageQueue.clear();
+	_postCommand.clear();
 	_inventorySlots.clear();
 
 	_world = _entities.createEntity(_entities.root(), "world");
@@ -302,6 +316,13 @@ void MainState::startGame(const Path& firstLevel) {
 	dialogText->setAnchor(Vector2(0, 1));
 	dialogText->setColor(Vector4(.32, .295, .16, 1));
 	dialogText->setSize(Vector2i(1140 - 2 * margin, 300 - 2 * margin));
+
+	_overlay = _entities.createEntity(_hud, "overlay");
+	SpriteComponent* sc = _sprites.addComponent(_overlay);
+	sc->setTexture("white.png");
+	sc->setAnchor(Vector2(.5, .5));
+	sc->setColor(Vector4(0, 0, 0, 1));
+	sc->setBlendingMode(BLEND_ALPHA);
 
 	startLevel(firstLevel);
 
@@ -363,7 +384,7 @@ void MainState::updateTick() {
 
 	_entities.setPrevWorldTransforms();
 
-	if(_messageQueue.empty()) {
+	if(_state == STATE_PLAY) {
 		// Player movement
 		Vector2 offset(0, 0);
 		if(_upInput->isPressed()) {
@@ -435,20 +456,30 @@ void MainState::updateTick() {
 		bump(1) -= std::max(0.01f + pColl->penetration(UP),    0.f);
 		_player.translate(bump);
 
-		static int playerTileMap[] = { 9, 3, 0, 6 };
-		int playerTile = playerTileMap[_playerDir];
 		if(!_player.translation2().isApprox(lastPlayerPos)) {
+			float prevAnim = _playerAnim;
 			_playerAnim += _playerAnimSpeed / float(TICKRATE);
-			playerTile += 1 + int(_playerAnim) % 2;
-		}
-		else
-			_playerAnim = 0;
+			orientPlayer(_playerDir, 1 + int(_playerAnim) % 2);
 
-		SpriteComponent* playerSprite = _sprites.get(_player);
-		playerSprite->setTileIndex(playerTile);
+			if(int(prevAnim) % 2 != int(_playerAnim) % 2)
+				playSound("footstep.wav");
+		}
+		else {
+			_playerAnim = 0;
+			orientPlayer(_playerDir);
+		}
 	}
-	else if(_useInput->justPressed()) {
+	else if(_state == STATE_FADE_IN || _state == STATE_FADE_OUT) {
+		_fadeAnim += 1. / (_fadeTime * float(TICKRATE));
+		if(_fadeAnim >= 1)
+			setState(STATE_PLAY);
+	}
+
+	if(!_messageQueue.empty()) {
+		if(_useInput->justPressed()) {
+			playSound("menu.wav");
 			nextMessage();
+		}
 	}
 
 	// WARNING: returning early might skip updateWorldTransform.
@@ -482,9 +513,22 @@ void MainState::updateFrame() {
 	_dialogText.updateWorldTransform();
 	_dialogText.setPrevWorldTransform();
 
+	_overlay.transform().setIdentity();
+	_overlay.transform().translate(Vector3(hudWidth / 2, hudHeight / 2, .7));
+	_overlay.transform().scale(Vector3(hudWidth + 2, hudHeight + 2, 1));
+	_overlay.updateWorldTransform();
+	_overlay.setPrevWorldTransform();
+
+	if(_state == STATE_FADE_IN) {
+		setOverlay(1 - _fadeAnim);
+	}
+	else if(_state == STATE_FADE_OUT) {
+		setOverlay(_fadeAnim);
+	}
+
 	for(int i=0; i < _inventorySlots.size(); ++i) {
 		EntityRef item = _inventorySlots[i];
-		item.place(Vector3(48 + 80 * i, hudHeight - 48, 0.8));
+		item.place(Vector3(48 + 80 * i, hudHeight - 48, 0.6));
 		item.updateWorldTransform();
 		item.setPrevWorldTransform();
 	}
@@ -571,6 +615,49 @@ void MainState::enqueueMessage(const std::string& message) {
 	if(_messageQueue.size() == 1) {
 		_dialogBox.setEnabled(true);
 		_texts.get(_dialogText)->setText(message);
+		setState(STATE_MESSAGE);
+	}
+}
+
+
+void MainState::setState(State state) {
+	std::string cmd;
+	if(_state != STATE_PLAY) {
+		// exec can set post command.
+		cmd = _postCommand;
+		_postCommand.clear();
+	}
+
+	dbgLogger.info("Set state: ", state);
+	_state = state;
+
+	if(_state == STATE_FADE_IN || _state == STATE_FADE_OUT)
+		_fadeAnim = 0;
+	if(_state == STATE_PLAY) {
+		_overlay.setEnabled(false);
+	}
+
+	if(!cmd.empty())
+		exec(cmd);
+}
+
+
+void MainState::setPostCommand(const std::string& command) {
+	dbgLogger.info("Set post command: ", command);
+	_postCommand = command;
+}
+
+
+void MainState::setPostCommand(int argc, const char** argv) {
+	if(argc == 0) {
+		_postCommand.clear();
+	}
+	else {
+		std::ostringstream out;
+		out << argv[0];
+		for(int i = 1; i < argc; ++i)
+			out << " " << argv[i];
+		setPostCommand(out.str());
 	}
 }
 
@@ -581,6 +668,9 @@ void MainState::nextMessage() {
 	_dialogBox.setEnabled(show);
 	if(show)
 		_texts.get(_dialogText)->setText(_messageQueue.front());
+	else {
+		setState(STATE_PLAY);
+	}
 }
 
 
@@ -614,6 +704,38 @@ void MainState::removeFromInventory(Item item) {
 		}
 	}
 	lairAssert(false);
+}
+
+
+void MainState::setOverlay(float opacity, const Vector4& color) {
+	_overlay.setEnabled(opacity > 0.001);
+	Vector4 c = color;
+	c(3) = opacity;
+
+	SpriteComponent* overlaySprite = _sprites.get(_overlay);
+	overlaySprite->setColor(c);
+}
+
+
+void MainState::preloadSound(const Path& sound) {
+	loader()->load<SoundLoader>(sound);
+	_soundMap.emplace(sound, _soundMap.size());
+}
+
+
+void MainState::playSound(const Path& sound) {
+	int chann = 0;
+	if(_soundMap.count(sound))
+		chann = _soundMap[sound];
+	audio()->playSound(assets()->getAsset(sound), 0, chann);
+}
+
+
+void MainState::orientPlayer(Direction dir, int frame) {
+	static int playerTileMap[] = { 9, 3, 0, 6 };
+
+	SpriteComponent* playerSprite = _sprites.get(_player);
+	playerSprite->setTileIndex(playerTileMap[dir] + frame);
 }
 
 

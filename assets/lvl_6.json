@@ -13,27 +13,16 @@
         }, 
         {
          "draworder":"topdown",
-         "height":43,
+         "height":0,
          "name":"Calque d'objets 1",
          "objects":[
                 {
                  "height":48,
-                 "id":1,
-                 "name":"spawn",
-                 "rotation":0,
-                 "type":"spawn",
-                 "visible":true,
-                 "width":48,
-                 "x":528,
-                 "y":1680
-                }, 
-                {
-                 "height":48,
                  "id":2,
-                 "name":"exit_prev",
+                 "name":"spawn",
                  "properties":
                     {
-                     "on_enter":"next_level lvl_1.json\n"
+                     "on_enter":"fade_out next_level lvl_1.json spawn2\n"
                     },
                  "propertytypes":
                     {
@@ -49,10 +38,10 @@
                 {
                  "height":48,
                  "id":3,
-                 "name":"exit",
+                 "name":"spawn2",
                  "properties":
                     {
-                     "on_enter":"next_level lvl_final.json\n"
+                     "on_enter":"fade_out next_level lvl_final.json\n"
                     },
                  "propertytypes":
                     {
@@ -71,7 +60,7 @@
                  "name":"radio",
                  "properties":
                     {
-                     "on_use":"message lvl_6_intro",
+                     "on_use":"play_sound radio.wav\nmessage lvl_6_intro",
                      "sprite":"items.png",
                      "tile_index":7,
                      "tile_v":4
@@ -93,11 +82,11 @@
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
-         "width":23,
+         "width":0,
          "x":0,
          "y":0
         }],
- "nextobjectid":5,
+ "nextobjectid":6,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tileheight":48,

@@ -13,13 +13,21 @@
         }, 
         {
          "draworder":"topdown",
-         "height":17,
+         "height":0,
          "name":"Calque d'objets 1",
          "objects":[
                 {
                  "height":48,
                  "id":4,
                  "name":"spawn",
+                 "properties":
+                    {
+                     "on_enter":"message general_intro fade_in"
+                    },
+                 "propertytypes":
+                    {
+                     "on_enter":"string"
+                    },
                  "rotation":0,
                  "type":"spawn",
                  "visible":true,
@@ -52,7 +60,7 @@
                  "name":"exit",
                  "properties":
                     {
-                     "on_enter":"next_level lvl_0.json\n"
+                     "on_enter":"fade_out next_level lvl_4.json\n"
                     },
                  "propertytypes":
                     {
@@ -71,7 +79,7 @@
                  "name":"radio_r",
                  "properties":
                     {
-                     "on_use":"message lvl_init_intro\nswitch door_r",
+                     "on_use":"play_sound radio.wav\nmessage lvl_init_intro set_door door_r 1",
                      "sprite":"items.png",
                      "tile_index":7,
                      "tile_v":4
@@ -89,15 +97,26 @@
                  "width":48,
                  "x":384,
                  "y":336
+                }, 
+                {
+                 "height":48,
+                 "id":13,
+                 "name":"spawn2",
+                 "rotation":0,
+                 "type":"spawn",
+                 "visible":true,
+                 "width":48,
+                 "x":384,
+                 "y":48
                 }],
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
-         "width":17,
+         "width":0,
          "x":0,
          "y":0
         }],
- "nextobjectid":13,
+ "nextobjectid":14,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tileheight":48,
