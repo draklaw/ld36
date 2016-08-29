@@ -50,11 +50,11 @@
 		"You : The left control pannel seems to deactivate the stasis machine, and the right one seems to free the creature..."
 	],
 
-	"lvl_f_bocal_left": [
+	"lvl_f_bocal_kill": [
 		"You : I know I've done right."
 	],
 
-	"lvl_f_bocal_right": [
+	"lvl_f_bocal_save": [
 		"??? : Hi, I'm Swth ! I can't thank you enought for freeing me, I was desesperate when I recorded these messages.",
 		"Swth : This ship is my vessel to come back home. If you want, you can come with me. Our people cohabited a long time with yours, and it would be the lesser I can do to thank you."
 	],

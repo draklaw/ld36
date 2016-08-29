@@ -214,6 +214,7 @@ EntityRef Level::createTrigger(const Json::Value &obj, const std::string& name) 
 
 	EntityRef entity = _mainState->createTrigger(_levelRoot, name.c_str(), hitBox);
 	entity.place((Vector3() << box.center(), 0.08).finished());
+	entity.setEnabled(props.get("enabled", true).asBool());
 
 
 	TriggerComponent* tc = _mainState->_triggers.addComponent(entity);

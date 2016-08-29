@@ -74,9 +74,16 @@ typedef std::shared_ptr<Level> LevelSP;
 
 
 enum Item {
-	ITEM_0,
-	ITEM_1,
-	ITEM_2,
+	ITEM_MAN,
+	ITEM_CARD,
+	ITEM_ARTEFACT,
+	ITEM_WRENCH,
+	ITEM_CABLE,
+	ITEM_CHIP,
+	ITEM_GROUPE,
+	ITEM_RADIO,
+	ITEM_COG,
+	ITEM_CORKSCREW,
 	ITEM_BG,
 };
 
@@ -136,6 +143,7 @@ public:
 	void setPostCommand(const std::string& command);
 	void setPostCommand(int argc, const char** argv);
 
+	void popupMessage(const std::string& key);
 	void enqueueMessage(const std::string& message);
 	void nextMessage();
 

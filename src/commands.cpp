@@ -127,14 +127,7 @@ int messageCommand(MainState* state, EntityRef self, int argc, const char** argv
 		return -2;
 	}
 
-	const Json::Value& messages = state->_messages.get(argv[1], Json::nullValue);
-	if(!messages.isArray()) {
-		dbgLogger.warning("messageCommand: invalid message identifier \"", argv[1], "\"");
-		return -2;
-	}
-
-	for(const Json::Value& msg: messages)
-		state->enqueueMessage(msg.asString());
+	state->popupMessage(argv[1]);
 
 	if(argc > 2)
 		state->setPostCommand(argc - 2, argv + 2);
@@ -235,7 +228,7 @@ int fadeInCommand(MainState* state, EntityRef self, int argc, const char** argv)
 
 	state->setState(STATE_FADE_IN);
 
-	if(argc > 2) {
+	if(argc > 1) {
 		state->setPostCommand(argc - 1, argv + 1);
 	}
 
@@ -251,7 +244,7 @@ int fadeOutCommand(MainState* state, EntityRef self, int argc, const char** argv
 
 	state->setState(STATE_FADE_OUT);
 
-	if(argc > 2) {
+	if(argc > 1) {
 		state->setPostCommand(argc - 1, argv + 1);
 	}
 
@@ -283,8 +276,9 @@ int bocalCommand(MainState* state, EntityRef self, int argc, const char** argv) 
 	}
 
 	if(state->_endingState == END_BOCAL_OFF) {
-		// enable consoles
-		// message
+		state->_sprites.get(state->_level->entity("left"))->setTileIndex(1);
+		state->_sprites.get(state->_level->entity("right"))->setTileIndex(1);
+		state->popupMessage("lvl_f_bocal_tout");
 		state->_endingState = END_BOCAL_ON;
 	}
 
@@ -298,8 +292,8 @@ int bocalKillCommand(MainState* state, EntityRef self, int argc, const char** ar
 	}
 
 	if(state->_endingState == END_BOCAL_ON) {
-		// change bocal sprite
-		// message
+		state->_sprites.get(state->_level->entity("bocal"))->setTileIndex(2);
+		state->popupMessage("lvl_f_bocal_kill");
 		state->_endingState = END_KILL;
 	}
 
@@ -313,10 +307,12 @@ int bocalSaveCommand(MainState* state, EntityRef self, int argc, const char** ar
 	}
 
 	if(state->_endingState == END_BOCAL_ON) {
-		// change bocal sprite
-		// spawn alien
-		// message
-		state->_endingState = END_SAVE;
+		if(state->hasItem(ITEM_ARTEFACT) && state->hasItem(ITEM_CHIP)) {
+			state->_sprites.get(state->_level->entity("bocal"))->setTileIndex(1);
+			state->_level->entity("alien").setEnabled(true);
+			state->popupMessage("lvl_f_bocal_save");
+			state->_endingState = END_SAVE;
+		}
 	}
 
 	return 0;
@@ -328,6 +324,12 @@ int letsFlyCommand(MainState* state, EntityRef self, int argc, const char** argv
 		return -2;
 	}
 
+	if(state->hasItem(ITEM_MAN) && state->hasItem(ITEM_CABLE) && state->hasItem(ITEM_GROUPE)) {
+		if(state->_endingState == END_SAVE)
+			state->popupMessage("lvl_f_swth_ship");
+		else
+			state->popupMessage("lvl_f_noswth_ship");
+	}
 
 	return 0;
 }
@@ -337,6 +339,11 @@ int letsQuitCommand(MainState* state, EntityRef self, int argc, const char** arg
 		dbgLogger.warning(argv[0], ": wrong number of argument.");
 		return -2;
 	}
+
+	if(state->_endingState == END_SAVE)
+		state->popupMessage("lvl_f_swth_noship");
+	else
+		state->popupMessage("lvl_f_noswth_noship");
 
 
 	return 0;

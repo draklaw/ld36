@@ -479,9 +479,19 @@ void MainState::updateTick() {
 			_playerAnim = 0;
 			orientPlayer(_playerDir);
 		}
+
+		_overlay.setEnabled(false);
 	}
 	else if(_state == STATE_FADE_IN || _state == STATE_FADE_OUT) {
 		_fadeAnim += 1. / (_fadeTime * float(TICKRATE));
+
+		if(_state == STATE_FADE_IN) {
+			setOverlay(1 - _fadeAnim);
+		}
+		else if(_state == STATE_FADE_OUT) {
+			setOverlay(_fadeAnim);
+		}
+
 		if(_fadeAnim >= 1)
 			setState(STATE_PLAY);
 	}
@@ -528,13 +538,6 @@ void MainState::updateFrame() {
 	_overlay.transform().scale(Vector3(hudWidth + 2, hudHeight + 2, 1));
 	_overlay.updateWorldTransform();
 	_overlay.setPrevWorldTransform();
-
-	if(_state == STATE_FADE_IN) {
-		setOverlay(1 - _fadeAnim);
-	}
-	else if(_state == STATE_FADE_OUT) {
-		setOverlay(_fadeAnim);
-	}
 
 	for(int i=0; i < _inventorySlots.size(); ++i) {
 		EntityRef item = _inventorySlots[i];
@@ -620,6 +623,16 @@ void MainState::updateTriggers(HitEventQueue& hitQueue, EntityRef useEntity, boo
 }
 
 
+void MainState::popupMessage(const std::string& key) {
+	const Json::Value& messages = _messages.get(key, Json::nullValue);
+	if(!messages.isArray())
+		return;
+
+	for(const Json::Value& msg: messages)
+		enqueueMessage(msg.asString());
+}
+
+
 void MainState::enqueueMessage(const std::string& message) {
 	_messageQueue.push_back(message);
 	if(_messageQueue.size() == 1) {
@@ -643,9 +656,6 @@ void MainState::setState(State state) {
 
 	if(_state == STATE_FADE_IN || _state == STATE_FADE_OUT)
 		_fadeAnim = 0;
-	if(_state == STATE_PLAY) {
-		_overlay.setEnabled(false);
-	}
 
 	if(!cmd.empty())
 		exec(cmd);
@@ -737,7 +747,13 @@ void MainState::playSound(const Path& sound) {
 	int chann = 0;
 	if(_soundMap.count(sound))
 		chann = _soundMap[sound];
-	audio()->playSound(assets()->getAsset(sound), 0, chann);
+
+	AssetSP asset = assets()->getAsset(sound);
+
+	if(sound == "footstep.wav")
+		asset->aspect<SoundAspect>()->get()->setVolume(.25);
+
+	audio()->playSound(asset, 0, chann);
 }
 
 
