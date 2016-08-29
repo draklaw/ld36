@@ -317,6 +317,9 @@ int bocalSaveCommand(MainState* state, EntityRef self, int argc, const char** ar
 			state->popupMessage("lvl_f_bocal_save");
 			state->_endingState = END_SAVE;
 		}
+		else {
+			state->popupMessage("lvl_f_missing_items");
+		}
 	}
 
 	return 0;
@@ -328,12 +331,15 @@ int letsFlyCommand(MainState* state, EntityRef self, int argc, const char** argv
 		return -2;
 	}
 
-	if(state->hasItem(ITEM_MAN) && state->hasItem(ITEM_CABLE) && state->hasItem(ITEM_GROUPE)) {
+	if(state->hasItem(ITEM_MAN) && state->hasItem(ITEM_CABLE) && state->hasItem(ITEM_GROUP)) {
 		state->removeFromInventory(ITEM_MAN);
 		state->removeFromInventory(ITEM_CABLE);
-		state->removeFromInventory(ITEM_GROUPE);
+		state->removeFromInventory(ITEM_GROUP);
 		state->setState(STATE_FADE_OUT);
 		state->setPostCommand("lets_fly_2");
+	}
+	else {
+		state->popupMessage("lvl_f_missing_items");
 	}
 
 	return 0;

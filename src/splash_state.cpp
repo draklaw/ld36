@@ -154,7 +154,7 @@ void SplashState::updateTick() {
 
 	if (_skipTime <= 0
 	|| _skipInput->justPressed()
-	|| sys()->getKeyState(SDL_SCANCODE_SPACE)
+//	|| sys()->getKeyState(SDL_SCANCODE_SPACE)
 	|| sys()->getKeyState(SDL_SCANCODE_RETURN)) {
 		// ESC quite the game.
 		if(sys()->getKeyState(SDL_SCANCODE_ESCAPE))

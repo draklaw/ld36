@@ -80,7 +80,11 @@
 		"After all, finding new territories is the purpose of explorers..."
 	],
 
-	"lvl_f_noswth_noship": [
+    "lvl_f_noswth_noship": [
 		"I feel like I've left a nightmare, and I hope I'll be able to sleep quietly again. Maybe it's time for me to go home, forget everything and become a farmer..."
+	],
+
+    "lvl_f_missing_items": [
+		"I don't have what is needed to make this works."
 	]
 }
