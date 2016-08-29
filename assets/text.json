@@ -39,6 +39,12 @@
 		"And... Please, don't freak out !"
 	],
 
+
+	"lvl_final_intro": [
+		"I should be really careful with all these devices. I mustn't make things blindly. The two control pannels seem to be linked with the jar-like device, and I distinguish a silhouette inside...",
+		"Near to the prow, I suppose it's the main control pannel. If I don't have all the items, I suppose neither one nor other devices will work... I can still go and find them."
+	],
+
 	"lvl_f_bocal_tout": [
 		"You : What a such Eerie creature ! If I use the gathered items, who knows what it will do...",
 		"You : The left control pannel seems to deactivate the stasis machine, and the right one seems to free the creature..."
@@ -57,7 +63,24 @@
 		"I can try to make this ship works... Or simply take this teleporter and leave everything behing me... My friends must be worried."
 	],
 
-	"lvl_f_bocal_enable": [
-		"Let's discover a new wold !"
+	"lvl_f_swth_ship": [
+		"I'm still surprised by the ease with which I've woke up Swth and decided to leave Earth. I won't lie : at first, I was a bit afraid, but the repairs were sufficients, and the trip quite short.",
+		"We shared my supplies and discussed a lot. Swth explained me some of their usages, but we admited that this knowledge may be outdated.",
+		"A couple of hours separates us from the landing, and I only feel excitation. After all, I'm an explorer !"
+	],
+
+	"lvl_f_swth_noship": [
+		"I don't know if letting Swth leave without me was the right thing to do. Even if the idea of discovering a whole new world was breath-taking... I couldn't. ",
+		"The people who need me are here, on Earth. I cannot leave them..."
+	],
+
+	"lvl_f_noswth_ship": [
+		"I still don't know what I'll find when the ship will land on a whole new world for me. I've hide the body of the alien, and I hope I have enough supplies to arrive somewhere.",
+		"I hope I'll find a better land for my people. If so, I'll come back and will be able to terraform a new world. Earth is not really suitable for us anymore...",
+		"After all, finding new territories is the purpose of explorers..."
+	],
+
+	"lvl_f_noswth_noship": [
+		"I feel like I've left a nightmare, and I hope I'll be able to sleep quietly again. Maybe it's time for me to go home, forget everything and become a farmer..."
 	]
 }
