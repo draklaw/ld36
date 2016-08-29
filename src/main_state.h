@@ -74,9 +74,16 @@ typedef std::shared_ptr<Level> LevelSP;
 
 
 enum Item {
-	ITEM_0,
-	ITEM_1,
-	ITEM_2,
+	ITEM_MAN,
+	ITEM_CARD,
+	ITEM_ARTEFACT,
+	ITEM_WRENCH,
+	ITEM_CABLE,
+	ITEM_CHIP,
+	ITEM_GROUP,
+	ITEM_RADIO,
+	ITEM_COG,
+	ITEM_CORKSCREW,
 	ITEM_BG,
 };
 
@@ -85,6 +92,13 @@ enum State {
 	STATE_MESSAGE,
 	STATE_FADE_IN,
 	STATE_FADE_OUT,
+};
+
+enum EndingState {
+	END_BOCAL_OFF,
+	END_BOCAL_ON,
+	END_SAVE,
+	END_KILL,
 };
 
 
@@ -129,6 +143,7 @@ public:
 	void setPostCommand(const std::string& command);
 	void setPostCommand(int argc, const char** argv);
 
+	void popupMessage(const std::string& key);
 	void enqueueMessage(const std::string& message);
 	void nextMessage();
 
@@ -182,6 +197,8 @@ public:
 	std::deque<std::string> _messageQueue;
 	OrthographicCamera _camera;
 	SoundMap _soundMap;
+
+	EndingState _endingState;
 
 	bool       _initialized;
 	bool       _running;

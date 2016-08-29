@@ -23,7 +23,9 @@
 
 #include <lair/sys_sdl2/audio_module.h>
 
+#include "game.h"
 #include "main_state.h"
+#include "splash_state.h"
 #include "level.h"
 
 #include "components.h"
@@ -127,14 +129,7 @@ int messageCommand(MainState* state, EntityRef self, int argc, const char** argv
 		return -2;
 	}
 
-	const Json::Value& messages = state->_messages.get(argv[1], Json::nullValue);
-	if(!messages.isArray()) {
-		dbgLogger.warning("messageCommand: invalid message identifier \"", argv[1], "\"");
-		return -2;
-	}
-
-	for(const Json::Value& msg: messages)
-		state->enqueueMessage(msg.asString());
+	state->popupMessage(argv[1]);
 
 	if(argc > 2)
 		state->setPostCommand(argc - 2, argv + 2);
@@ -235,7 +230,7 @@ int fadeInCommand(MainState* state, EntityRef self, int argc, const char** argv)
 
 	state->setState(STATE_FADE_IN);
 
-	if(argc > 2) {
+	if(argc > 1) {
 		state->setPostCommand(argc - 1, argv + 1);
 	}
 
@@ -251,9 +246,146 @@ int fadeOutCommand(MainState* state, EntityRef self, int argc, const char** argv
 
 	state->setState(STATE_FADE_OUT);
 
-	if(argc > 2) {
+	if(argc > 1) {
 		state->setPostCommand(argc - 1, argv + 1);
 	}
+
+	return 0;
+}
+
+
+int disableCommand(MainState* state, EntityRef self, int argc, const char** argv) {
+	if(argc != 1) {
+		dbgLogger.warning(argv[0], ": wrong number of argument.");
+		return -2;
+	}
+
+	if(!self.isValid()) {
+		dbgLogger.warning(argv[0], ": self is not set.");
+		return -2;
+	}
+
+	self.setEnabled(false);
+
+	return 0;
+}
+
+
+int bocalCommand(MainState* state, EntityRef self, int argc, const char** argv) {
+	if(argc != 1) {
+		dbgLogger.warning(argv[0], ": wrong number of argument.");
+		return -2;
+	}
+
+	if(state->_endingState == END_BOCAL_OFF) {
+		state->_sprites.get(state->_level->entity("left"))->setTileIndex(1);
+		state->_sprites.get(state->_level->entity("right"))->setTileIndex(1);
+		state->popupMessage("lvl_f_bocal_tout");
+		state->_endingState = END_BOCAL_ON;
+	}
+
+	return 0;
+}
+
+int bocalKillCommand(MainState* state, EntityRef self, int argc, const char** argv) {
+	if(argc != 1) {
+		dbgLogger.warning(argv[0], ": wrong number of argument.");
+		return -2;
+	}
+
+	if(state->_endingState == END_BOCAL_ON) {
+		state->_sprites.get(state->_level->entity("bocal"))->setTileIndex(2);
+		state->popupMessage("lvl_f_bocal_kill");
+		state->_endingState = END_KILL;
+	}
+
+	return 0;
+}
+
+int bocalSaveCommand(MainState* state, EntityRef self, int argc, const char** argv) {
+	if(argc != 1) {
+		dbgLogger.warning(argv[0], ": wrong number of argument.");
+		return -2;
+	}
+
+	if(state->_endingState == END_BOCAL_ON) {
+		if(state->hasItem(ITEM_ARTEFACT) && state->hasItem(ITEM_CHIP)) {
+			state->removeFromInventory(ITEM_ARTEFACT);
+			state->removeFromInventory(ITEM_CHIP);
+			state->_sprites.get(state->_level->entity("bocal"))->setTileIndex(1);
+			state->_level->entity("alien").setEnabled(true);
+			state->popupMessage("lvl_f_bocal_save");
+			state->_endingState = END_SAVE;
+		}
+		else {
+			state->popupMessage("lvl_f_missing_items");
+		}
+	}
+
+	return 0;
+}
+
+int letsFlyCommand(MainState* state, EntityRef self, int argc, const char** argv) {
+	if(argc != 1) {
+		dbgLogger.warning(argv[0], ": wrong number of argument.");
+		return -2;
+	}
+
+	if(state->hasItem(ITEM_MAN) && state->hasItem(ITEM_CABLE) && state->hasItem(ITEM_GROUP)) {
+		state->removeFromInventory(ITEM_MAN);
+		state->removeFromInventory(ITEM_CABLE);
+		state->removeFromInventory(ITEM_GROUP);
+		state->setState(STATE_FADE_OUT);
+		state->setPostCommand("lets_fly_2");
+	}
+	else {
+		state->popupMessage("lvl_f_missing_items");
+	}
+
+	return 0;
+}
+
+int letsFly2Command(MainState* state, EntityRef self, int argc, const char** argv) {
+	if(argc != 1) {
+		dbgLogger.warning(argv[0], ": wrong number of argument.");
+		return -2;
+	}
+
+	if(state->_endingState == END_SAVE)
+		state->popupMessage("lvl_f_swth_ship");
+	else
+		state->popupMessage("lvl_f_noswth_ship");
+
+	state->setPostCommand("credits");
+
+	return 0;
+}
+
+int letsQuitCommand(MainState* state, EntityRef self, int argc, const char** argv) {
+	if(argc != 1) {
+		dbgLogger.warning(argv[0], ": wrong number of argument.");
+		return -2;
+	}
+
+	if(state->_endingState == END_SAVE)
+		state->popupMessage("lvl_f_swth_noship");
+	else
+		state->popupMessage("lvl_f_noswth_noship");
+
+	state->setPostCommand("credits");
+
+	return 0;
+}
+
+int creditsCommand(MainState* state, EntityRef self, int argc, const char** argv) {
+	if(argc != 1) {
+		dbgLogger.warning(argv[0], ": wrong number of argument.");
+		return -2;
+	}
+
+	state->game()->splashState()->setup(nullptr, "tileset.png");
+	state->game()->setNextState(state->game()->splashState());
+	state->quit();
 
 	return 0;
 }

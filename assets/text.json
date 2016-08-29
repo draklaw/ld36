@@ -6,57 +6,57 @@
     ],
 	
 	"general_intro": [
-		"Several years passed since the Last War. In fact, it would be more like several centuries. The nuclear winter covered the earth with ashes, turned the water brown and made the air so toxic than few of us barely survived.",
-		"Nobody remembers exactly what launched the Last War. Nobody remembers who won it, because in the end, it doesn't matter. There is few records of this period, or the one before : the computers crashed and the various recordings were erased by the nuclear blast.",
-		"The fallouts took centuries to decrease, and the society had to reinvent itself. We wanted to survive.",
-		"On the 15th March 2931, we saw the first mammals outside the troglodyte bunkers that sheltered us. It took some decades before we decided to go outside too. We created some explorer groups, in order to reconquer our world.",
-		"I'm one of these explorers, and even if I lost my group in a sandstorm, I decided to continue. The radio signal I received may come from other survivors..."
+		"Many years have passed since the Last War. In fact, it would be more like centuries. The nuclear winter covered the earth with ashes, turned the water brown and made the air so toxic that only a few of us survived, barely.",
+		"Nobody remembers exactly what started the Last War. Nobody remembers who eventually won, because in the end, it doesn't matter. There are few records of this period, or the one before: the computers crashed and all the recordings were erased by the nuclear blast.",
+		"The fallout took centuries to decrease, and society had to reinvent itself. We wanted to survive.",
+		"On the 15th March of 2931, we saw the first mammals outside the troglodyte bunkers that sheltered us. It took some decades before we decided to go outside too. We designated scouting parties, in order to reconquer our world.",
+		"I'm one of these explorers; I lost my group in a sandstorm, but I decided to continue. The radio signal I caught may have come from other survivors..."
 	],
 	
 	"lvl_init_intro": [
-		"If you can hear this record, it means you have received the signal of my ship. I need you help.",
-		"I don't know what happened, I've been in artificial sleep with my brothers and sisters, but they left without me. The ship must have had a problem : when I woke up, I was alone, and there were damages onboard.",
-		"I'm not sure how to fix the ship, I didn't found its manual, and the food was missing. So, I put myself back in artificial sleep, hopping my people will help me...",
-		"If you accept to help me, I would need you to find various items in order to repair my ship and to extract me from my artificial sleep : when I woke up, the timer was broken, I could only pray for somebody to come and save me...",
-		"So, find your way in the ship, and gather the pieces of it. You're my only hope !" 
+		"If you can hear this record, it means you have received my ship's signal. I need your help.",
+		"I don't know what happened, I was in artificial sleep with my brothers and sisters, but they left without me. The ship must have had a problem: when I woke up, I was alone, and there was much damage on board.",
+		"I'm not sure how to fix the ship, I couldn't find its manual, and the food was missing too. So, I put myself back in artificial sleep, hoping my people will help me...",
+		"If you're willing to help me, I need you to find various items in order to repair my ship and wake me from my artificial sleep: last I woke up, the timer was broken, so I can only pray that somebody will come and save me...",
+		"So, find your way to the ship, and gather the missing parts. You're my only hope !" 
 	],
 
 	"lvl_4_intro": [
-		"We had to protect our ships from intruders. There is two main mecanisms : warps and doors.",
-		"Warps are linked two by two, you can go both way with them. Some of them can be used as entrance or exit of a room.",
-		"The doors often react with switches. The red switch acts differently than others.",
-		"Sometime, you can use items on devices. Just press \"space\", whatever it means, to do so."
+		"We had to protect our ships from intruders. There are two main mechanisms: warps and doors.",
+		"Warps are linked in pairs, and can be crossed both ways. Some of them can be used to enter or leave a room.",
+		"Doors are activated with switches. The red switch acts differently than others.",
+		"Sometimes, you can use items on devices. Just \"press space\", whatever it means, to do so."
 	],
 
 	"lvl_0_intro": [
-		"In the beginning they praised us like gods and goddesses, for long centuries. They couldn't understand our technology, it was miracles for them, and they burried their kings and queens in shrines shapes like our ships.",
-		"Time passed. I don't know what changed, but the began to fear us. Then, they try to fight us, and we had to run away.",
+		"In the beginning they praised us like gods and goddesses, for long centuries. They couldn't understand our technology, and looked upon it as some sort of divine force, and they burried their kings and queens in shrines shaped like our ships.",
+		"Time passed. Things changed. I don't know why, but they began to fear us. Then, they tried to fight us, and we had to run away.",
 		"I've already explained the next events... Please, don't abandon me !"
 	],
 
 	"lvl_6_intro": [
-		"After this room, you will find the bridge of my ship. I hope you have found everything.",
+		"After this room, you will find the bridge of the ship. I hope you have found everything.",
 		"And... Please, don't freak out !"
 	],
 
 
 	"lvl_final_intro": [
-		"I should be really careful with all these devices. I mustn't make things blindly. The two control pannels seem to be linked with the jar-like device, and I distinguish a silhouette inside...",
-		"Near to the prow, I suppose it's the main control pannel. If I don't have all the items, I suppose neither one nor other devices will work... I can still go and find them."
+		"I should be really careful with all these devices. I mustn't do things blindly. The two control pannels seem to be linked with the jar-like device, and there is a silhouette inside...",
+		"Near to the prow, I suppose it's the main control pannel. If I don't have all the items, I suppose neither of these devices will work... I can still go back and find them."
 	],
 
 	"lvl_f_bocal_tout": [
-		"You : What a such Eerie creature ! If I use the gathered items, who knows what it will do...",
+		"You : Such an eerie creature ! If I use the gathered items, who knows what it will do...",
 		"You : The left control pannel seems to deactivate the stasis machine, and the right one seems to free the creature..."
 	],
 
-	"lvl_f_bocal_left": [
-		"You : I know I've done right."
+    "lvl_f_bocal_kill": [
+		"You : I know I did the right thing."
 	],
 
-	"lvl_f_bocal_right": [
-		"??? : Hi, I'm Swth ! I can't thank you enought for freeing me, I was desesperate when I recorded these messages.",
-		"Swth : This ship is my vessel to come back home. If you want, you can come with me. Our people cohabited a long time with yours, and it would be the lesser I can do to thank you."
+    "lvl_f_bocal_save": [
+		"??? : Hi, I'm Swth ! I can't thank you enough for freeing me, I was desperate when I recorded these messages.",
+		"Swth : This ship is my way to go back home. If you want, you can come with me. Our people cohabited a long time with yours, and it would be the least I can do to thank you."
 	],
 
 	"lvl_f_board_tout": [
@@ -64,9 +64,9 @@
 	],
 
 	"lvl_f_swth_ship": [
-		"I'm still surprised by the ease with which I've woke up Swth and decided to leave Earth. I won't lie : at first, I was a bit afraid, but the repairs were sufficients, and the trip quite short.",
-		"We shared my supplies and discussed a lot. Swth explained me some of their usages, but we admited that this knowledge may be outdated.",
-		"A couple of hours separates us from the landing, and I only feel excitation. After all, I'm an explorer !"
+		"I'm still surprised by the ease with which I've woke up Swth and decided to leave Earth. I won't lie: at first, I was a bit afraid, but the repairs were sufficient, and the trip quite short.",
+		"We shared my supplies and discussed a lot. Swth showed me the ways of his people, but he admited that this knowledge may be outdated.",
+		"A couple of hours separates us from the landing, and I feel only excitement. After all, I'm an explorer !"
 	],
 
 	"lvl_f_swth_noship": [
@@ -75,12 +75,17 @@
 	],
 
 	"lvl_f_noswth_ship": [
-		"I still don't know what I'll find when the ship will land on a whole new world for me. I've hide the body of the alien, and I hope I have enough supplies to arrive somewhere.",
-		"I hope I'll find a better land for my people. If so, I'll come back and will be able to terraform a new world. Earth is not really suitable for us anymore...",
+		"I still don't know what I'll find when the ship will land on a whole new world for me. I've hidden the body of the alien, and I hope I have enough supplies to arrive somewhere.",
+		"I hope I'll find a better land for my people. If so, I'll come back and we'll be able to terraform a new world. Earth is not really suitable for us anymore...",
 		"After all, finding new territories is the purpose of explorers..."
 	],
 
-	"lvl_f_noswth_noship": [
+    "lvl_f_noswth_noship": [
 		"I feel like I've left a nightmare, and I hope I'll be able to sleep quietly again. Maybe it's time for me to go home, forget everything and become a farmer..."
+	],
+
+    "lvl_f_missing_items": [
+		"I don't have what is needed to make this works."
 	]
 }
+

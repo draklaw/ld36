@@ -200,12 +200,12 @@ switch door_blue
   </object>
   <object id="28" name="item_0" type="item" x="240" y="240" width="48" height="48">
    <properties>
-    <property name="item" type="int" value="3"/>
+    <property name="item" type="int" value="5"/>
    </properties>
   </object>
   <object id="30" name="item_1" type="item" x="1440" y="912" width="48" height="48">
    <properties>
-    <property name="item" type="int" value="8"/>
+    <property name="item" type="int" value="4"/>
    </properties>
   </object>
   <object id="35" name="exit_prev" type="trigger" x="864" y="1824" width="144" height="48">
