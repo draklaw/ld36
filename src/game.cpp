@@ -49,7 +49,7 @@ Game::~Game() {
 void Game::initialize() {
 	GameBase::initialize();
 
-	window()->setUtf8Title(CMAKE_PROJECT_NAME);
+	window()->setUtf8Title("Pyramid Raider - Ludum Dare 36");
 //	window()->resize(1920 / 4, 1080 / 4);
 //	window()->setFullscreen(true);
 

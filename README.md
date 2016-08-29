@@ -1,6 +1,9 @@
-# Lair template: A simple template for a game using lair
+# Pyramid Raider
 
-This is just a base to start a game jam.
+A short game done in 72 hours for the Ludum Dare 36.
+
+In a post-apocalyptic future, an explorer discovers a pyramid full of mysteries. Will he be able to save the world ? Probably not.
+
 
 ## Compilation
 
