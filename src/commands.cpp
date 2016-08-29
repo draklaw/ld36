@@ -372,6 +372,8 @@ int letsQuitCommand(MainState* state, EntityRef self, int argc, const char** arg
 		return -2;
 	}
 
+	state->playSound("tp.wav");
+
 	if(state->_endingState == END_SAVE)
 		state->popupMessage("lvl_f_swth_noship");
 	else
@@ -388,7 +390,6 @@ int creditsCommand(MainState* state, EntityRef self, int argc, const char** argv
 		return -2;
 	}
 
-	state->playSound("tp.wav");
 	state->game()->splashState()->setup(nullptr, "credits.png");
 	state->game()->setNextState(state->game()->splashState());
 	state->quit();
