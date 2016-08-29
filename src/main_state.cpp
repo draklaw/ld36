@@ -339,6 +339,12 @@ void MainState::startGame(const Path& firstLevel) {
 
 	loader()->waitAll();
 
+//	addToInventory(ITEM_MAN);
+//	addToInventory(ITEM_CABLE);
+//	addToInventory(ITEM_ARTEFACT);
+//	addToInventory(ITEM_GROUP);
+//	addToInventory(ITEM_CHIP);
+
 	dbgLogger.info("Entity count: ", _entities.nEntities(), " (", _entities.nZombieEntities(), " zombies)");
 }
 
