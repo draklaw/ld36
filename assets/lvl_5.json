@@ -34,7 +34,7 @@
                  "properties":
                     {
                      "margin":-16,
-                     "on_enter":"fade_out next_level lvl_0v2.json\n"
+                     "on_enter":"play_sound tp.wav\nfade_out next_level lvl_0v2.json\n"
                     },
                  "propertytypes":
                     {
@@ -55,7 +55,7 @@
                  "properties":
                     {
                      "margin":-16,
-                     "on_enter":"fade_out next_level lvl_4.json spawn2\n"
+                     "on_enter":"play_sound tp.wav\nfade_out next_level lvl_4.json spawn2\n"
                     },
                  "propertytypes":
                     {

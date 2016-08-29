@@ -57,7 +57,7 @@ void Game::initialize() {
 	_mainState.reset(new MainState(this));
 
 	_splashState->initialize();
-//	_splashState->setup(_mainState.get(), "titlescreen.png", 3);
+	_splashState->setup(_mainState.get(), "titlescreen.png", 3);
 
 	_mainState->initialize();
 	_mainState->startGame(_firstLevel);

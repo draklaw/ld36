@@ -37,14 +37,16 @@
   <object id="6" name="spawn2" type="trigger" x="912" y="240" width="48" height="48">
    <properties>
     <property name="margin" type="float" value="-16"/>
-    <property name="on_enter">fade_out next_level lvl_0v2.json
+    <property name="on_enter">play_sound tp.wav
+fade_out next_level lvl_0v2.json
 </property>
    </properties>
   </object>
   <object id="7" name="spawn" type="trigger" x="240" y="912" width="48" height="48">
    <properties>
     <property name="margin" type="float" value="-16"/>
-    <property name="on_enter">fade_out next_level lvl_4.json spawn2
+    <property name="on_enter">play_sound tp.wav
+fade_out next_level lvl_4.json spawn2
 </property>
    </properties>
   </object>

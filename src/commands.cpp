@@ -294,6 +294,7 @@ int bocalKillCommand(MainState* state, EntityRef self, int argc, const char** ar
 	}
 
 	if(state->_endingState == END_BOCAL_ON) {
+		state->playSound("menu.wav");
 		state->_sprites.get(state->_level->entity("bocal"))->setTileIndex(2);
 		state->popupMessage("lvl_f_bocal_kill");
 		state->_endingState = END_KILL;
@@ -310,6 +311,7 @@ int bocalSaveCommand(MainState* state, EntityRef self, int argc, const char** ar
 
 	if(state->_endingState == END_BOCAL_ON) {
 		if(state->hasItem(ITEM_ARTEFACT) && state->hasItem(ITEM_CHIP)) {
+			state->playSound("menu.wav");
 			state->removeFromInventory(ITEM_ARTEFACT);
 			state->removeFromInventory(ITEM_CHIP);
 			state->_sprites.get(state->_level->entity("bocal"))->setTileIndex(1);
@@ -318,6 +320,7 @@ int bocalSaveCommand(MainState* state, EntityRef self, int argc, const char** ar
 			state->_endingState = END_SAVE;
 		}
 		else {
+			state->playSound("button.wav");
 			state->popupMessage("lvl_f_missing_items");
 		}
 	}
@@ -332,6 +335,7 @@ int letsFlyCommand(MainState* state, EntityRef self, int argc, const char** argv
 	}
 
 	if(state->hasItem(ITEM_MAN) && state->hasItem(ITEM_CABLE) && state->hasItem(ITEM_GROUP)) {
+		state->playSound("menu.wav");
 		state->removeFromInventory(ITEM_MAN);
 		state->removeFromInventory(ITEM_CABLE);
 		state->removeFromInventory(ITEM_GROUP);
@@ -339,6 +343,7 @@ int letsFlyCommand(MainState* state, EntityRef self, int argc, const char** argv
 		state->setPostCommand("lets_fly_2");
 	}
 	else {
+		state->playSound("button.wav");
 		state->popupMessage("lvl_f_missing_items");
 	}
 
@@ -383,7 +388,8 @@ int creditsCommand(MainState* state, EntityRef self, int argc, const char** argv
 		return -2;
 	}
 
-	state->game()->splashState()->setup(nullptr, "tileset.png");
+	state->playSound("tp.wav");
+	state->game()->splashState()->setup(nullptr, "credits.png");
 	state->game()->setNextState(state->game()->splashState());
 	state->quit();
 
