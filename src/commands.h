@@ -67,6 +67,9 @@ int bocalCommand(MainState* state, EntityRef self, int argc, const char** argv);
 int bocalKillCommand(MainState* state, EntityRef self, int argc, const char** argv);
 int bocalSaveCommand(MainState* state, EntityRef self, int argc, const char** argv);
 int letsFlyCommand(MainState* state, EntityRef self, int argc, const char** argv);
+int letsFly2Command(MainState* state, EntityRef self, int argc, const char** argv);
 int letsQuitCommand(MainState* state, EntityRef self, int argc, const char** argv);
+
+int creditsCommand(MainState* state, EntityRef self, int argc, const char** argv);
 
 #endif

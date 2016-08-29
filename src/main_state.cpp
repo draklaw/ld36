@@ -105,7 +105,9 @@ MainState::MainState(Game* game)
 	_commands["bocal_kill"]  = bocalKillCommand;
 	_commands["bocal_save"]  = bocalSaveCommand;
 	_commands["lets_fly"]    = letsFlyCommand;
+	_commands["lets_fly_2"]  = letsFly2Command;
 	_commands["lets_quit"]   = letsQuitCommand;
+	_commands["credits"]     = creditsCommand;
 }
 
 

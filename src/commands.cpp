@@ -23,7 +23,9 @@
 
 #include <lair/sys_sdl2/audio_module.h>
 
+#include "game.h"
 #include "main_state.h"
+#include "splash_state.h"
 #include "level.h"
 
 #include "components.h"
@@ -308,6 +310,8 @@ int bocalSaveCommand(MainState* state, EntityRef self, int argc, const char** ar
 
 	if(state->_endingState == END_BOCAL_ON) {
 		if(state->hasItem(ITEM_ARTEFACT) && state->hasItem(ITEM_CHIP)) {
+			state->removeFromInventory(ITEM_ARTEFACT);
+			state->removeFromInventory(ITEM_CHIP);
 			state->_sprites.get(state->_level->entity("bocal"))->setTileIndex(1);
 			state->_level->entity("alien").setEnabled(true);
 			state->popupMessage("lvl_f_bocal_save");
@@ -325,11 +329,28 @@ int letsFlyCommand(MainState* state, EntityRef self, int argc, const char** argv
 	}
 
 	if(state->hasItem(ITEM_MAN) && state->hasItem(ITEM_CABLE) && state->hasItem(ITEM_GROUPE)) {
-		if(state->_endingState == END_SAVE)
-			state->popupMessage("lvl_f_swth_ship");
-		else
-			state->popupMessage("lvl_f_noswth_ship");
+		state->removeFromInventory(ITEM_MAN);
+		state->removeFromInventory(ITEM_CABLE);
+		state->removeFromInventory(ITEM_GROUPE);
+		state->setState(STATE_FADE_OUT);
+		state->setPostCommand("lets_fly_2");
 	}
+
+	return 0;
+}
+
+int letsFly2Command(MainState* state, EntityRef self, int argc, const char** argv) {
+	if(argc != 1) {
+		dbgLogger.warning(argv[0], ": wrong number of argument.");
+		return -2;
+	}
+
+	if(state->_endingState == END_SAVE)
+		state->popupMessage("lvl_f_swth_ship");
+	else
+		state->popupMessage("lvl_f_noswth_ship");
+
+	state->setPostCommand("credits");
 
 	return 0;
 }
@@ -345,6 +366,20 @@ int letsQuitCommand(MainState* state, EntityRef self, int argc, const char** arg
 	else
 		state->popupMessage("lvl_f_noswth_noship");
 
+	state->setPostCommand("credits");
+
+	return 0;
+}
+
+int creditsCommand(MainState* state, EntityRef self, int argc, const char** argv) {
+	if(argc != 1) {
+		dbgLogger.warning(argv[0], ": wrong number of argument.");
+		return -2;
+	}
+
+	state->game()->splashState()->setup(nullptr, "tileset.png");
+	state->game()->setNextState(state->game()->splashState());
+	state->quit();
 
 	return 0;
 }
