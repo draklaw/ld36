@@ -370,6 +370,8 @@ void MainState::startLevel(const Path& level, const std::string& spawn) {
 
 	_level = _levels[level];
 	_level->start(spawn);
+
+	loader()->waitAll();
 }
 
 
