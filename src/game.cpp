@@ -52,6 +52,7 @@ void Game::initialize() {
 	window()->setUtf8Title("Pyramid Raider - Ludum Dare 36");
 //	window()->resize(1920 / 4, 1080 / 4);
 //	window()->setFullscreen(true);
+	sys()->setVSyncEnabled(_config.get("vsync", true).asBool());
 
 	_splashState.reset(new SplashState(this));
 	_mainState.reset(new MainState(this));

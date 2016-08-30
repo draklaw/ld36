@@ -20,6 +20,9 @@
 if(MSVC)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /SUBSYSTEM:WINDOWS")
 endif()
+if(MINGW)
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -mwindows")
+endif()
 
 add_definitions("-DCMAKE_PROJECT_NAME=\"${CMAKE_PROJECT_NAME}\"")
 
